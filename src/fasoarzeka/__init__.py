@@ -4,28 +4,24 @@ Unofficial API client for Faso Arzeka mobile money payments in Burkina Faso
 """
 
 from importlib.metadata import version
-from .arzeka import (
-    ArzekaPayment,
+
+from .base import ArzekaPayment
+from .exceptions import (
+    ArzekaAuthenticationError,
+    ArzekaConnectionError,
+    ArzekaPaymentError,
+    ArzekaValidationError,
+)
+from .main import (
     authenticate,
     check_payment,
+    check_sms_status,
     close_shared_client,
     get_shared_client,
     initiate_payment,
     send_sms,
-    check_sms_status,
 )
-from .utils import (
-    format_msisdn,
-    get_reference,
-    validate_phone_number,
-    generate_hash_signature,
-)
-from .exceptions import (
-    ArzekaAuthenticationError,
-    ArzekaPaymentError,
-    ArzekaValidationError,
-    ArzekaConnectionError,
-)
+from .utils import format_msisdn, generate_hash_signature, get_reference, validate_phone_number
 
 __version__ = version("fasoarzeka")
 __author__ = "Mohamed Zeba (m.zeba@mzeba.dev)"
