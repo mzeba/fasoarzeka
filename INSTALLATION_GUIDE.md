@@ -1,25 +1,42 @@
 # Guide d'Installation - Faso Arzeka Payment
 
-## 🎯 Problème résolu
-
-Vous aviez un problème d'importation car la structure du projet n'était pas correcte pour un package Python. Voici la solution et comment utiliser la librairie.
-
 ## 📁 Structure correcte du projet
 
 La librairie est maintenant organisée comme suit :
 
-```
+```bash
 arzeka-payment/
-├── fasoarzeka/              # ← Package principal
-│   ├── __init__.py          # ← Exports et métadonnées
-│   ├── arzeka.py           # ← Classe principale ArzekaPayment
-│   ├── exceptions.py       # ← Exceptions personnalisées
-│   └── utils.py           # ← Fonctions utilitaires
-├── examples/              # ← Exemples d'utilisation
-├── test/                 # ← Tests
-├── setup.py              # ← Configuration d'installation
-├── pyproject.toml        # ← Configuration moderne
-└── requirements.txt      # ← Dépendances
+├── src/
+│   └── fasoarzeka/              # ← Package principal
+│       ├── __init__.py          # ← Exports et métadonnées
+│       ├── arzeka.py            # ← Classe principale ArzekaPayment
+│       ├── exceptions.py        # ← Exceptions personnalisées
+│       └── utils.py             # ← Fonctions utilitaires
+├── test/
+│   ├── __init__.py              # ← Tests package
+│   └── test.py                  # ← Tests unitaires
+├── docs/                        # ← Documentation
+│   ├── QUICKSTART.md
+│   ├── AUTHENTICATION.md
+│   ├── AUTO_REAUTH.md
+│   ├── TOKEN_VALIDATION.md
+│   └── MODIFICATIONS_SUMMARY.md
+├── examples/                    # ← Exemples d'utilisation
+│   ├── authentication_example.py
+│   ├── auto_reauth_example.py
+│   ├── shared_client_example.py
+│   ├── token_validation_example.py
+│   ├── example.py
+│   ├── test_auto_reauth.py
+│   └── test_signature_improvements.py
+├── CHANGELOG.md                 # ← Historique des modifications
+├── INSTALLATION_GUIDE.md        # ← Ce fichier
+├── LICENSE                      # ← Licence MIT
+├── README.md                    # ← Documentation principale
+├── requirements.txt             # ← Dépendances
+├── setup.py                     # ← Configuration d'installation
+├── setup.cfg                    # ← Configuration additionnelle
+└── pyproject.toml               # ← Configuration Poetry
 ```
 
 ## 🚀 Installation
@@ -28,10 +45,10 @@ arzeka-payment/
 
 ```bash
 # Via pip depuis GitHub
-pip install git+https://github.com/parice02/fasoarzeka.git
+pip install git+https://github.com/mzeba/fasoarzeka.git
 
 # Ou en mode développement (pour contribuer)
-git clone https://github.com/parice02/fasoarzeka.git
+git clone https://github.com/mzeba/fasoarzeka.git
 cd fasoarzeka
 pip install -e .
 ```
@@ -44,6 +61,8 @@ Si vous avez téléchargé le code :
 cd /chemin/vers/arzeka-payment
 pip install -e .
 ```
+
+**Note :** Le script `setup.py` configure automatiquement le chemin vers le répertoire `src/fasoarzeka/`
 
 ### Méthode 3 : Avec un environnement virtuel (recommandé)
 
@@ -204,23 +223,27 @@ python test_import.py
 **Solutions :**
 
 1. **Vérifiez l'installation :**
+
    ```bash
    pip list | grep fasoarzeka
    ```
 
 2. **Réinstallez :**
+
    ```bash
    pip uninstall fasoarzeka
    pip install -e .
    ```
 
 3. **Vérifiez l'environnement Python :**
+
    ```bash
    which python
    which pip
    ```
 
 4. **Avec un environnement virtuel :**
+
    ```bash
    source .venv/bin/activate  # Assurez-vous que le venv est activé
    pip install -e .
@@ -229,6 +252,7 @@ python test_import.py
 ### Problème : `ImportError: attempted relative import with no known parent package`
 
 **Solution :** Utilisez les imports absolus :
+
 ```python
 # ✅ Correct
 from fasoarzeka import ArzekaPayment
@@ -240,6 +264,7 @@ from .arzeka import ArzekaPayment
 ### Problème : `AttributeError: module 'fasoarzeka' has no attribute 'ArzekaPayment'`
 
 **Solution :** Vérifiez que `__init__.py` expose correctement les classes :
+
 ```python
 # Dans fasoarzeka/__init__.py
 from .arzeka import ArzekaPayment
@@ -253,10 +278,13 @@ __all__ = ['ArzekaPayment', 'ArzekaAPIError', ...]
 
 Consultez le dossier `examples/` pour des exemples d'utilisation :
 
-- `examples/authentication_example.py` - Authentification
-- `examples/example.py` - Exemple de base
+- `examples/authentication_example.py` - Exemples d'authentification
+- `examples/example.py` - Exemple simple
 - `examples/shared_client_example.py` - Client partagé
-- `examples/auto_reauth_example.py` - Ré-authentification automatique
+- `examples/auto_reauth_example.py` - Réauthentification automatique
+- `examples/token_validation_example.py` - Validation des tokens
+- `examples/test_auto_reauth.py` - Test réauthentification
+- `examples/test_signature_improvements.py` - Test signatures améliorées
 
 ## 🔗 Installation dans un autre projet
 
@@ -266,14 +294,14 @@ Pour utiliser cette librairie dans un autre projet :
 
 ```bash
 # Dans votre nouveau projet
-pip install git+https://github.com/parice02/fasoarzeka.git
+pip install git+https://github.com/mzeba/fasoarzeka.git
 ```
 
 ### 2. Ajout au requirements.txt
 
 ```text
 # requirements.txt de votre projet
-fasoarzeka @ git+https://github.com/parice02/fasoarzeka.git
+fasoarzeka @ git+https://github.com/mzeba/fasoarzeka.git
 ```
 
 ### 3. Utilisation
@@ -289,20 +317,21 @@ client = ArzekaPayment()
 ## ✅ Checklist finale
 
 - [ ] La librairie est installée : `pip list | grep fasoarzeka`
-- [ ] L'import fonctionne : `python -c "import fasoarzeka"`
+- [ ] L'import fonctionne : `python -c "from fasoarzeka import ArzekaPayment"`
 - [ ] La classe principale est accessible : `from fasoarzeka import ArzekaPayment`
 - [ ] Un environnement virtuel est utilisé (recommandé)
 - [ ] Les exemples fonctionnent
+- [ ] La structure `src/fasoarzeka/` est en place
 
-## 🎉 Félicitations !
+## 🎉 Félicitations
 
 Votre librairie **fasoarzeka** est maintenant correctement installée et utilisable !
 
 Pour plus d'aide, consultez :
-- 📖 Documentation complète dans `docs_sphinx/`
+
+- 📖 Documentation complète dans `docs/`
 - 💡 Exemples dans `examples/`
 - 🐛 Issues sur GitHub
+- 📚 README.md pour l'utilisation générale
 
 ---
-
-**Note :** Cette librairie est maintenant correctement structurée en tant que package Python et peut être distribuée sur PyPI si nécessaire.
