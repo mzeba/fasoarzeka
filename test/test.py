@@ -14,10 +14,10 @@ from fasoarzeka import (
     ArzekaPayment,
     ArzekaValidationError,
     authenticate,
-    initiate_payment,
     check_payment,
     close_shared_client,
     get_shared_client,
+    initiate_payment,
 )
 
 
