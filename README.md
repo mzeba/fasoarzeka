@@ -1,6 +1,6 @@
 # FASO ARZEKA Mobile Money Payment API (Burkina Faso)
 
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 API client Python non officiel pour les paiements mobiles FASO ARZEKA au Burkina Faso v3.0.1.
@@ -61,7 +61,7 @@ pip install -e .
 ### Option 1 : Utilisation avec fonctions de convenance (Recommandé)
 
 ```python
-from arzeka import authenticate, initiate_payment, check_payment
+from fasoarzeka import authenticate, initiate_payment, check_payment
 
 # 1. Authentifiez-vous une fois
 auth = authenticate("your_username", "your_password")
@@ -93,7 +93,7 @@ print(f"Payment status: {payment_response['status']}")
 ### Option 2 : Utilisation avec instance de classe
 
 ```python
-from arzeka import ArzekaPayment
+from fasoarzeka import ArzekaPayment
 
 # Utilisez le context manager pour gestion automatique
 with ArzekaPayment() as client:
@@ -130,7 +130,7 @@ with ArzekaPayment() as client:
 ### Authentification et gestion des tokens
 
 ```python
-from arzeka import ArzekaPayment
+from fasoarzeka import ArzekaPayment
 
 client = ArzekaPayment()
 
@@ -157,7 +157,7 @@ client.close()
 ### Réauthentification automatique
 
 ```python
-from arzeka import ArzekaPayment
+from fasoarzeka import ArzekaPayment
 
 client = ArzekaPayment()
 client.authenticate("username", "password")
@@ -184,7 +184,7 @@ client.close()
 ### Initialisation de paiement avec reçu
 
 ```python
-from arzeka import initiate_payment, authenticate
+from fasoarzeka import initiate_payment, authenticate
 
 # Authentifiez-vous d'abord
 authenticate("username", "password")
@@ -217,7 +217,7 @@ print(f"Order ID: {response.get('mappedOrderId')}")
 ### Vérification de paiement
 
 ```python
-from arzeka import check_payment, authenticate
+from fasoarzeka import check_payment, authenticate
 
 authenticate("username", "password")
 
@@ -236,7 +236,7 @@ print(f"Transaction Status: {status}")
 ### Utilisation des fonctions utilitaires
 
 ```python
-from arzeka import get_reference, format_msisdn, validate_phone_number
+from fasoarzeka import get_reference, format_msisdn, validate_phone_number
 
 # Générer un ID de référence unique
 ref = get_reference()
@@ -256,9 +256,8 @@ print(f"Valid: {is_valid}")  # True
 Le client fournit des exceptions spécifiques pour différents types d'erreurs :
 
 ```python
-from arzeka import ArzekaPayment
-
-from exceptions import (
+from fasoarzeka import ArzekaPayment
+from fasoarzeka.exceptions import (
     ArzekaPaymentError,
     ArzekaConnectionError,
     ArzekaValidationError,
@@ -318,7 +317,7 @@ ARZEKA_BASE_URL=https://pwg-test.fasoarzeka.com/AvepayPaymentGatewayUI/avepay-pa
 
 ```python
 import os
-from arzeka import ArzekaPayment
+from fasoarzeka import ArzekaPayment
 
 client = ArzekaPayment(
     base_url=os.getenv('ARZEKA_BASE_URL'),
@@ -335,7 +334,7 @@ client.authenticate(
 
 ```python
 import logging
-from arzeka import ArzekaPayment
+from fasoarzeka import ArzekaPayment
 
 # Configurer le niveau de log
 logging.basicConfig(
@@ -381,6 +380,7 @@ pip install -r requirements.txt
 ```
 
 La documentation comprend :
+
 - Guide d'installation détaillé
 - Guide de démarrage rapide
 - Guide d'authentification complet
@@ -407,25 +407,39 @@ La documentation comprend :
 
 ## 🏗️ Architecture
 
-```
+```bash
 arzeka-payment/
-├── arzeka.py              # Module principal
-├── utils.py               # Fonctions utilitaires
-├── __init__.py            # Exports publics
-├── requirements.txt       # Dépendances
-├── setup.py              # Configuration d'installation
-├── pyproject.toml        # Configuration Poetry
-├── docs/                 # Documentation
-│   ├── QUICKSTART.md
-│   ├── AUTHENTICATION.md
-│   └── TOKEN_VALIDATION.md
-├── examples/             # Exemples de code
-│   ├── authentication_example.py
-│   ├── token_validation_example.py
-│   ├── shared_client_example.py
-│   └── auto_reauth_example.py
-└── test/                 # Tests unitaires
-    └── test.py
+├── src/
+│   └── fasoarzeka/           # Package principal
+│       ├── __init__.py       # Exports publics
+│       ├── arzeka.py         # Module principal
+│       ├── exceptions.py     # Exceptions personnalisées
+│       └── utils.py          # Fonctions utilitaires
+├── test/
+│   ├── __init__.py           # Tests package
+│   └── test.py               # Tests unitaires (authentification & vérification)
+├── docs/
+│   ├── QUICKSTART.md         # Guide de démarrage rapide
+│   ├── AUTHENTICATION.md     # Guide d'authentification
+│   ├── AUTO_REAUTH.md        # Réauthentification automatique
+│   ├── TOKEN_VALIDATION.md   # Validation des tokens
+│   └── MODIFICATIONS_SUMMARY.md  # Résumé des modifications
+├── examples/
+│   ├── authentication_example.py      # Exemples d'authentification
+│   ├── auto_reauth_example.py         # Réauthentification automatique
+│   ├── shared_client_example.py       # Instance partagée
+│   ├── token_validation_example.py    # Validation de tokens
+│   ├── example.py                     # Exemple simple
+│   ├── test_auto_reauth.py            # Test réauthentification
+│   └── test_signature_improvements.py # Test signatures améliorées
+├── CHANGELOG.md              # Historique des modifications
+├── INSTALLATION_GUIDE.md     # Guide d'installation détaillé
+├── LICENSE                   # Licence MIT
+├── README.md                 # Ce fichier
+├── requirements.txt          # Dépendances du projet
+├── setup.py                  # Configuration setuptools
+├── setup.cfg                 # Configuration additionnelle
+└── pyproject.toml            # Configuration Poetry
 ```
 
 ## 🔧 Classes et Exceptions
@@ -452,6 +466,7 @@ arzeka-payment/
 # - Maximum 3 tentatives
 # - Backoff exponentiel (1s, 2s, 4s)
 # - Status codes: 429, 500, 502, 503, 504
+from fasoarzeka import ArzekaPayment
 client = ArzekaPayment()
 # Les retries sont automatiques !
 ```
@@ -460,6 +475,7 @@ client = ArzekaPayment()
 
 ```python
 # Les connexions HTTP sont réutilisées pour meilleures performances
+from fasoarzeka import ArzekaPayment
 client = ArzekaPayment()
 # La session est automatiquement gérée
 ```
@@ -468,6 +484,7 @@ client = ArzekaPayment()
 
 ```python
 # Gestion automatique des ressources
+from fasoarzeka import ArzekaPayment
 with ArzekaPayment() as client:
     client.authenticate("user", "pass")
     response = client.initiate_payment(...)
@@ -477,7 +494,7 @@ with ArzekaPayment() as client:
 ### 4. Instance partagée pour fonctions de convenance
 
 ```python
-from arzeka import authenticate, initiate_payment, get_shared_client, close_shared_client
+from fasoarzeka import authenticate, initiate_payment, get_shared_client, close_shared_client
 
 # Les fonctions partagent une même instance
 authenticate("user", "pass")
@@ -497,7 +514,7 @@ close_shared_client()
 
 ```python
 import os
-from arzeka import authenticate
+from fasoarzeka import authenticate
 
 username = os.getenv('ARZEKA_USERNAME')
 password = os.getenv('ARZEKA_PASSWORD')
@@ -507,6 +524,7 @@ authenticate(username, password)
 ### 2. Utiliser le context manager
 
 ```python
+from fasoarzeka import ArzekaPayment
 with ArzekaPayment() as client:
     client.authenticate("user", "pass")
     # ... opérations ...
@@ -625,7 +643,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 ## 📞 Support
 
 - **Issues** : [GitHub Issues](https://github.com/parice02/fasoarzeka/issues)
-- **Email** : m.zeba@mzeba.dev
+- **Email** : <m.zeba@mzeba.dev>
 - **Documentation** : [GitHub Wiki](https://github.com/parice02/fasoarzeka/wiki)
 
 ## ⚠️ Avertissement
@@ -643,7 +661,7 @@ Si ce projet vous aide, n'oubliez pas de lui donner une ⭐ sur GitHub !
 Pour la production, assurez-vous de configurer l'URL de production :
 
 ```python
-from arzeka import ArzekaPayment
+from fasoarzeka import ArzekaPayment
 
 client = ArzekaPayment(base_url="https://pwg.fasoarzeka.com/...")
 ```

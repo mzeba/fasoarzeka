@@ -11,20 +11,19 @@ with open(BASE_DIR / "README.md") as file:
 
 setup(
     name="fasoarzeka",
-    version="0.0.1",
+    version="0.1.0",
     long_description=_description,
     long_description_content_type="text/markdown",
     url="https://github.com/parice02/fasoarzeka",
-    description="API non officiel pour les paiements mobiles le moyen de paiement FASO ARZEKA au Burkina Faso",
+    description="API non officielle de paiement mobile pour le service FASO ARZEKA au Burkina Faso",
     packages=find_packages(),
     author="Mohamed Zeba",
     author_email="m.zeba@mzeba.dev",
     license=_license,
     classifiers=[
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
         "Operating System :: OS Independent",
     ],
-    requires=["request", "urllib3"],
+    requires=["requests>=2.31.0", "urllib3<1.27,>=1.21.1"],
 )
