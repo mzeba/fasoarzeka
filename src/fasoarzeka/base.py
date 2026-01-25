@@ -141,7 +141,7 @@ class BasePayment:
         """
         headers = {
             "Content-Type": "application/x-www-form-urlencoded",
-            "User-Agent": "arzeka-payment-client/1.0",
+            "User-Agent": "fasoarzeka-payment-client/1.0",
             "Accept-Language": "fr-FR,en-GB;q=0.8,en;q=0.6",
             "Authorization": f"{self._token_type} {self._token}",
         }
