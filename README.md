@@ -642,9 +642,9 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de 
 
 ## 📞 Support
 
-- **Issues** : [GitHub Issues](https://github.com/parice02/fasoarzeka/issues)
+- **Issues** : [GitHub Issues](https://github.com/mzeba/fasoarzeka/issues)
 - **Email** : <m.zeba@mzeba.dev>
-- **Documentation** : [GitHub Wiki](https://github.com/parice02/fasoarzeka/wiki)
+- **Documentation** : [GitHub Wiki](https://github.com/mzeba/fasoarzeka/wiki)
 
 ## ⚠️ Avertissement
 
