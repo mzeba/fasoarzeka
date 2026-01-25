@@ -76,7 +76,7 @@ payment_data = {
         "last_name": "Dupont",
         "mobile": "22670123456"  # Numéro avec indicatif
     },
-    "mapped_order_id": "eT20220923.203221.24732",
+    "mapped_order_id": "T20220923.203221.24732",
     "hash_secret": "your_hash_secret",
     "link_for_update_status": "https://example.com/webhook",
     "link_back_to_calling_website": "https://example.com/return"
@@ -113,14 +113,14 @@ with ArzekaPayment() as client:
             "last_name": "Dupont",
             "mobile": "70123456"
         },
-        mapped_order_id="eT20220923.203221.24732",
+        mapped_order_id="T20220923.203221.24732",
         hash_secret="your_hash_secret",
         link_for_update_status="https://example.com/webhook",
         link_back_to_calling_website="https://example.com/return"
     )
 
     # 4. Vérifiez le statut
-    status = client.check_payment("eT20220923.203221.24732")
+    status = client.check_payment("T20220923.203221.24732")
 
 # Le client est automatiquement fermé
 ```
