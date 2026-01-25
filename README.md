@@ -626,7 +626,7 @@ Les contributions sont les bienvenues ! Voici comment contribuer :
 
 Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique détaillé des modifications.
 
-## �📄 Licence
+## 📄 Licence
 
 Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
 
