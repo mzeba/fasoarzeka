@@ -29,7 +29,7 @@ Client robuste, production-ready avec gestion automatique des erreurs, retry aut
 
 2. **Certificats SSL** (si fournis par l'opérateur)
 
-3. **Python 3.9 ou supérieur**
+3. **Python 3.8 ou supérieur**
 
 ## 📦 Dépendances
 
@@ -39,19 +39,19 @@ setuptools
 urllib3
 ```
 
-Le client nécessite Python 3.9 ou supérieur.
+Le client nécessite Python 3.8 ou supérieur.
 
 ## 🚀 Installation
 
 ```bash
 # Avec pip
-pip install git+https://github.com/parice02/fasoarzeka.git
+pip install git+https://github.com/mzeba/fasoarzeka.git
 
 # Avec poetry
-poetry add git+https://github.com/parice02/fasoarzeka.git
+poetry add git+https://github.com/mzeba/fasoarzeka.git
 
 # Installation en mode développement
-git clone https://github.com/parice02/fasoarzeka.git
+git clone https://github.com/mzeba/fasoarzeka.git
 cd fasoarzeka
 pip install -e .
 ```
