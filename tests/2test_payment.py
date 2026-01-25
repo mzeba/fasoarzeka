@@ -41,7 +41,7 @@ class TestPaymentVerification(unittest.TestCase):
             self.client.check_payment(mapped_order_id=None)
 
     @patch.object(ArzekaPayment, "_ensure_valid_token")
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_success(self, mock_post, mock_ensure):
         """Test de vérification de paiement réussie"""
         mock_response = Mock()
@@ -63,7 +63,7 @@ class TestPaymentVerification(unittest.TestCase):
         mock_post.assert_called_once()
 
     @patch.object(ArzekaPayment, "_ensure_valid_token")
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_pending(self, mock_post, mock_ensure):
         """Test de vérification de paiement en attente"""
         mock_response = Mock()
@@ -82,7 +82,7 @@ class TestPaymentVerification(unittest.TestCase):
         self.assertEqual(result["mappedOrderId"], "ORDER124")
 
     @patch.object(ArzekaPayment, "_ensure_valid_token")
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_failed(self, mock_post, mock_ensure):
         """Test de vérification de paiement échoué"""
         mock_response = Mock()
@@ -101,7 +101,7 @@ class TestPaymentVerification(unittest.TestCase):
         self.assertIn("reason", result)
 
     @patch.object(ArzekaPayment, "_ensure_valid_token")
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_api_error(self, mock_post, mock_ensure):
         """Test de vérification de paiement avec erreur API"""
         mock_response = Mock()
@@ -181,7 +181,7 @@ class TestArzekaPayment(unittest.TestCase):
         self.assertGreater(info["expires_in_seconds"], 0)
         self.assertGreater(info["expires_in_minutes"], 0)
 
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_authenticate_success(self, mock_post):
         """Test d'authentification réussie"""
         mock_response = Mock()
@@ -218,7 +218,7 @@ class TestArzekaPayment(unittest.TestCase):
         with self.assertRaises(ArzekaValidationError):
             self.client.authenticate(None, "password")
 
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_authenticate_http_401_error(self, mock_post):
         """Test d'erreur 401 lors de l'authentification"""
         mock_response = Mock()
@@ -334,7 +334,7 @@ class TestArzekaPayment(unittest.TestCase):
             )
 
     @patch.object(ArzekaPayment, "_ensure_valid_token")
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_initiate_payment_success(self, mock_post, mock_ensure):
         """Test de paiement réussi"""
         # Setup
@@ -380,7 +380,7 @@ class TestArzekaPayment(unittest.TestCase):
             self.client.check_payment(mapped_order_id=None)
 
     @patch.object(ArzekaPayment, "_ensure_valid_token")
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_success(self, mock_post, mock_ensure):
         """Test de vérification de paiement réussie"""
         self.client._token = "valid_token"

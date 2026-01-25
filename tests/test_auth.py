@@ -47,7 +47,7 @@ class TestAuthentication(unittest.TestCase):
         with self.assertRaises(ArzekaValidationError):
             self.client.authenticate("username", None)
 
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_authenticate_success(self, mock_post):
         """Test d'authentification réussie"""
         mock_response = Mock()
@@ -73,7 +73,7 @@ class TestAuthentication(unittest.TestCase):
         self.assertEqual(self.client._password, "test_password")
         self.assertIsNotNone(self.client._expires_at)
 
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_authenticate_invalid_credentials(self, mock_post):
         """Test d'authentification avec identifiants invalides"""
         mock_response = Mock()
@@ -87,7 +87,7 @@ class TestAuthentication(unittest.TestCase):
         with self.assertRaises(ArzekaAuthenticationError):
             self.client.authenticate("wrong_user", "wrong_password")
 
-    @patch("fasoarzeka.requests.Session.post")
+    @patch("fasoarzeka.base.requests.Session.post")
     def test_authenticate_server_error(self, mock_post):
         """Test d'authentification avec erreur serveur (500)"""
         mock_response = Mock()
