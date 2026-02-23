@@ -1,6 +1,6 @@
-=======================
+============================
 Guide de démarrage rapide
-=======================
+============================
 
 Ce guide vous apprendra les bases de l'utilisation de la bibliothèque Faso Arzeka Payment en quelques minutes.
 

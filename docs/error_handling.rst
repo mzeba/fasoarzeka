@@ -1,6 +1,6 @@
-================
+======================
 Gestion des erreurs
-================
+======================
 
 Ce guide couvre les stratégies et bonnes pratiques pour gérer les erreurs dans vos applications utilisant Faso Arzeka Payment.
 

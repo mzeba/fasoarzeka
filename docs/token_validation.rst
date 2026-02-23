@@ -1,6 +1,6 @@
-==================
+======================
 Validation des tokens
-==================
+======================
 
 La bibliothèque fournit des méthodes pour vérifier la validité des tokens d'authentification
 et obtenir des informations détaillées sur leur expiration.

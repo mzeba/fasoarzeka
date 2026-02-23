@@ -1,6 +1,6 @@
-========
+======================
 Paiements
-========
+======================
 
 Ce guide couvre toutes les opérations liées aux paiements : initiation, vérification de statut, et gestion des webhooks.
 
