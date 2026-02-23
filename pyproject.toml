@@ -25,6 +25,7 @@ keywords = [
 Homepage = "https://pypi.org/project/fasoarzeka/"
 Issues = "https://github.com/mzeba/fasoarzeka/issues"
 Repository = "https://github.com/mzeba/fasoarzeka.git"
+Documentation = "https://fasoarzeka.readthedocs.io/fr/latest/"
 
 [build-system]
 requires = ["setuptools>=77.0"]
