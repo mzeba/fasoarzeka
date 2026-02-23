@@ -1,14 +1,13 @@
 # Requirements for building the documentation with Sphinx
 
 # Core Sphinx
-sphinx>=5.0.0
+sphinx>=5.0.0,<8.0.0
 sphinx-rtd-theme>=1.2.0
 
 # Extensions
 myst-parser>=1.0.0
 sphinx-autodoc-typehints>=1.23.0
 
-# Dependencies of the project itself
-requests>=2.31.0
-setuptools
-urllib3
+# Dependencies of the project itself (needed for autodoc)
+#requests>=2.31.0
+#urllib3<1.27
