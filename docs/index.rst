@@ -3,13 +3,15 @@
 Documentation Faso Arzeka Payment API
 =======================================
 
-.. image:: https://img.shields.io/badge/python-3.8+-blue.svg
-   :target: https://www.python.org/downloads/
-   :alt: Python 3.8+
+.. only:: html
 
-.. image:: https://img.shields.io/badge/License-MIT-yellow.svg
-   :target: https://opensource.org/licenses/MIT
-   :alt: License: MIT
+   .. image:: https://img.shields.io/badge/python-3.8+-blue.svg
+      :target: https://www.python.org/downloads/
+      :alt: Python 3.8+
+
+   .. image:: https://img.shields.io/badge/License-MIT-yellow.svg
+      :target: https://opensource.org/licenses/MIT
+      :alt: License: MIT
 
 Bienvenue sur la documentation du client Python pour l'API de paiement mobile **Faso Arzeka**
 au Burkina Faso (version 3.0.1).

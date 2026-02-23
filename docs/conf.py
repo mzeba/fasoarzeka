@@ -70,6 +70,27 @@ html_theme_options = {
     "titles_only": False,
 }
 
+# -- Options for LaTeX output ------------------------------------------------
+latex_elements = {
+    "preamble": r"""
+\usepackage{newunicodechar}
+% Define emoji replacements for LaTeX
+\newunicodechar{✅}{[OK]}
+\newunicodechar{❌}{[X]}
+\newunicodechar{⚠}{[!]}
+\newunicodechar{🔧}{[CONF]}
+\newunicodechar{📚}{[DOC]}
+\newunicodechar{✨}{[NEW]}
+\newunicodechar{🐛}{[BUG]}
+\newunicodechar{🎉}{[DONE]}
+\newunicodechar{🔄}{}
+\newunicodechar{⏳}{[...]}
+\newunicodechar{⏱}{[TIME]}
+\newunicodechar{🔐}{[SEC]}
+\newunicodechar{🔍}{[SEARCH]}
+""",
+}
+
 # -- Options for intersphinx extension ---------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html#configuration
 
