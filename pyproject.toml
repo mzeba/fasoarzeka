@@ -1,12 +1,12 @@
 [project]
-name = "fasoarzeka"
+name = "orange-money-bfa"
 version = "0.1.3"
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-description = "API non officielle de paiement mobile pour le service FASO ARZEKA au Burkina Faso"
+description = "API non officielle de paiement mobile Orange Money au Burkina Faso"
 authors = [{ name = "Mohamed ZEBA", email = "m.zeba@mzeba.dev" }]
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.8"
@@ -14,7 +14,7 @@ license = "MIT"
 license-files = ["LICENSE"]
 dependencies = ["requests>=2.31.0", "urllib3<1.27"]
 keywords = [
-    "fasoarzeka ",
+    "orange money",
     "burkina payment api",
     "mobile money",
     "payment api",
@@ -22,10 +22,10 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = "https://pypi.org/project/fasoarzeka/"
-Issues = "https://github.com/mzeba/fasoarzeka/issues"
-Repository = "https://github.com/mzeba/fasoarzeka.git"
-Documentation = "https://fasoarzeka.readthedocs.io/fr/latest/"
+Homepage = "https://pypi.org/project/orange-money-bfa/"
+Issues = "https://github.com/mzeba/orange-money-bfa/issues"
+Repository = "https://github.com/mzeba/orange-money-bfa.git"
+Documentation = "https://orange-money-bfa.readthedocs.io/fr/latest/"
 
 [build-system]
 requires = ["setuptools>=77.0"]

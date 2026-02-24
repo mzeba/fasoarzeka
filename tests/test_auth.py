@@ -4,10 +4,10 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from fasoarzeka import (
-    ArzekaAuthenticationError,
-    ArzekaPayment,
-    ArzekaValidationError,
+from orange_money import (
+    OrangeMoneyAuthenticationError,
+    OrangeMoneyPayment,
+    OrangeMoneyValidationError,
     authenticate,
     check_payment,
     close_shared_client,
@@ -21,7 +21,7 @@ class TestAuthentication(unittest.TestCase):
 
     def setUp(self):
         """Configuration avant chaque test"""
-        self.client = ArzekaPayment()
+        self.client = OrangeMoneyPayment()
 
     def tearDown(self):
         """Nettoyage après chaque test"""
@@ -29,22 +29,22 @@ class TestAuthentication(unittest.TestCase):
 
     def test_authenticate_validation_empty_username(self):
         """Test validation d'authentification avec username vide"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate("", "password")
 
     def test_authenticate_validation_empty_password(self):
         """Test validation d'authentification avec password vide"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate("username", "")
 
     def test_authenticate_validation_none_username(self):
         """Test validation d'authentification avec username None"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate(None, "password")
 
     def test_authenticate_validation_none_password(self):
         """Test validation d'authentification avec password None"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate("username", None)
 
     @patch("fasoarzeka.base.requests.Session.post")
@@ -84,7 +84,7 @@ class TestAuthentication(unittest.TestCase):
             requests.exceptions.HTTPError("401 Unauthorized")
         )
 
-        with self.assertRaises(ArzekaAuthenticationError):
+        with self.assertRaises(OrangeMoneyAuthenticationError):
             self.client.authenticate("wrong_user", "wrong_password")
 
     @patch("fasoarzeka.base.requests.Session.post")
@@ -98,7 +98,7 @@ class TestAuthentication(unittest.TestCase):
             requests.exceptions.HTTPError("500 Server Error")
         )
 
-        with self.assertRaises(ArzekaAuthenticationError):
+        with self.assertRaises(OrangeMoneyAuthenticationError):
             self.client.authenticate("test_user", "test_password")
 
     def test_is_token_valid_no_token(self):
@@ -149,7 +149,7 @@ class TestAuthentication(unittest.TestCase):
         self.assertGreater(info["expires_in_seconds"], 0)
         self.assertGreater(info["expires_in_minutes"], 0)
 
-    @patch.object(ArzekaPayment, "authenticate")
+    @patch.object(OrangeMoneyPayment, "authenticate")
     def test_ensure_valid_token_with_valid_token(self, mock_auth):
         """Test _ensure_valid_token avec token valide"""
         self.client._token = "valid_token"
@@ -164,12 +164,12 @@ class TestAuthentication(unittest.TestCase):
         self.client._token = "expired_token"
         self.client._expires_at = time.time() - 100
 
-        with self.assertRaises(ArzekaAuthenticationError) as context:
+        with self.assertRaises(OrangeMoneyAuthenticationError) as context:
             self.client._ensure_valid_token()
 
         self.assertIn("no credentials stored", str(context.exception))
 
-    @patch.object(ArzekaPayment, "authenticate")
+    @patch.object(OrangeMoneyPayment, "authenticate")
     def test_ensure_valid_token_auto_reauth(self, mock_auth):
         """Test de réauthentification automatique quand token expiré"""
         self.client._token = "expired_token"

@@ -4,10 +4,10 @@ from unittest.mock import Mock, patch
 
 import requests
 
-from fasoarzeka import (
-    ArzekaAuthenticationError,
-    ArzekaPayment,
-    ArzekaValidationError,
+from orange_money import (
+    OrangeMoneyAuthenticationError,
+    OrangeMoneyPayment,
+    OrangeMoneyValidationError,
     authenticate,
     check_payment,
     close_shared_client,
@@ -21,7 +21,7 @@ class TestPaymentVerification(unittest.TestCase):
 
     def setUp(self):
         """Configuration avant chaque test"""
-        self.client = ArzekaPayment()
+        self.client = OrangeMoneyPayment()
         # Simule un client authentifié
         self.client._token = "valid_token"
         self.client._expires_at = time.time() + 3600
@@ -32,15 +32,15 @@ class TestPaymentVerification(unittest.TestCase):
 
     def test_check_payment_validation_empty_order_id(self):
         """Test validation de vérification avec order_id vide"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.check_payment(mapped_order_id="")
 
     def test_check_payment_validation_none_order_id(self):
         """Test validation de vérification avec order_id None"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.check_payment(mapped_order_id=None)
 
-    @patch.object(ArzekaPayment, "_ensure_valid_token")
+    @patch.object(OrangeMoneyPayment, "_ensure_valid_token")
     @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_success(self, mock_post, mock_ensure):
         """Test de vérification de paiement réussie"""
@@ -62,7 +62,7 @@ class TestPaymentVerification(unittest.TestCase):
         mock_ensure.assert_called_once()
         mock_post.assert_called_once()
 
-    @patch.object(ArzekaPayment, "_ensure_valid_token")
+    @patch.object(OrangeMoneyPayment, "_ensure_valid_token")
     @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_pending(self, mock_post, mock_ensure):
         """Test de vérification de paiement en attente"""
@@ -81,7 +81,7 @@ class TestPaymentVerification(unittest.TestCase):
         self.assertEqual(result["status"], "pending")
         self.assertEqual(result["mappedOrderId"], "ORDER124")
 
-    @patch.object(ArzekaPayment, "_ensure_valid_token")
+    @patch.object(OrangeMoneyPayment, "_ensure_valid_token")
     @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_failed(self, mock_post, mock_ensure):
         """Test de vérification de paiement échoué"""
@@ -100,7 +100,7 @@ class TestPaymentVerification(unittest.TestCase):
         self.assertEqual(result["status"], "failed")
         self.assertIn("reason", result)
 
-    @patch.object(ArzekaPayment, "_ensure_valid_token")
+    @patch.object(OrangeMoneyPayment, "_ensure_valid_token")
     @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_api_error(self, mock_post, mock_ensure):
         """Test de vérification de paiement avec erreur API"""
@@ -116,12 +116,12 @@ class TestPaymentVerification(unittest.TestCase):
             self.client.check_payment(mapped_order_id="INVALID_ORDER")
 
 
-class TestArzekaPayment(unittest.TestCase):
-    """Tests pour la classe ArzekaPayment"""
+class TestOrangeMoneyPayment(unittest.TestCase):
+    """Tests pour la classe OrangeMoneyPayment"""
 
     def setUp(self):
         """Configuration avant chaque test"""
-        self.client = ArzekaPayment()
+        self.client = OrangeMoneyPayment()
 
     def tearDown(self):
         """Nettoyage après chaque test"""
@@ -207,15 +207,15 @@ class TestArzekaPayment(unittest.TestCase):
     def test_authenticate_validation_errors(self):
         """Test des erreurs de validation d'authentification"""
         # Username vide
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate("", "password")
 
         # Password vide
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate("username", "")
 
         # Username non-string
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.authenticate(None, "password")
 
     @patch("fasoarzeka.base.requests.Session.post")
@@ -229,7 +229,7 @@ class TestArzekaPayment(unittest.TestCase):
             requests.exceptions.HTTPError()
         )
 
-        with self.assertRaises(ArzekaAuthenticationError) as context:
+        with self.assertRaises(OrangeMoneyAuthenticationError) as context:
             self.client.authenticate("wrong_user", "wrong_password")
 
         self.assertIn("Invalid credentials", str(context.exception))
@@ -239,12 +239,12 @@ class TestArzekaPayment(unittest.TestCase):
         self.client._token = "expired_token"
         self.client._expires_at = time.time() - 100
 
-        with self.assertRaises(ArzekaAuthenticationError) as context:
+        with self.assertRaises(OrangeMoneyAuthenticationError) as context:
             self.client._ensure_valid_token()
 
         self.assertIn("no credentials stored", str(context.exception))
 
-    @patch.object(ArzekaPayment, "authenticate")
+    @patch.object(OrangeMoneyPayment, "authenticate")
     def test_ensure_valid_token_with_valid_token(self, mock_auth):
         """Test _ensure_valid_token avec token valide"""
         self.client._token = "valid_token"
@@ -254,7 +254,7 @@ class TestArzekaPayment(unittest.TestCase):
         self.client._ensure_valid_token()
         mock_auth.assert_not_called()
 
-    @patch.object(ArzekaPayment, "authenticate")
+    @patch.object(OrangeMoneyPayment, "authenticate")
     def test_ensure_valid_token_auto_reauth(self, mock_auth):
         """Test de réauthentification automatique"""
         self.client._token = "expired_token"
@@ -292,11 +292,11 @@ class TestArzekaPayment(unittest.TestCase):
         }
 
         # Montant trop petit
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.initiate_payment(amount=50, **payment_data)
 
         # Montant négatif
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.initiate_payment(amount=-100, **payment_data)
 
     def test_initiate_payment_validation_merchant_id(self):
@@ -313,7 +313,7 @@ class TestArzekaPayment(unittest.TestCase):
             "link_back_to_calling_website": "https://example.com/return",
         }
 
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.initiate_payment(merchant_id="", **payment_data)
 
     def test_initiate_payment_validation_additional_info(self):
@@ -327,13 +327,13 @@ class TestArzekaPayment(unittest.TestCase):
         }
 
         # Manque first_name
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.initiate_payment(
                 additional_info={"last_name": "Doe", "mobile": "70123456"},
                 **payment_data,
             )
 
-    @patch.object(ArzekaPayment, "_ensure_valid_token")
+    @patch.object(OrangeMoneyPayment, "_ensure_valid_token")
     @patch("fasoarzeka.base.requests.Session.post")
     def test_initiate_payment_success(self, mock_post, mock_ensure):
         """Test de paiement réussi"""
@@ -373,13 +373,13 @@ class TestArzekaPayment(unittest.TestCase):
 
     def test_check_payment_validation(self):
         """Test de validation pour vérification de paiement"""
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.check_payment(mapped_order_id="")
 
-        with self.assertRaises(ArzekaValidationError):
+        with self.assertRaises(OrangeMoneyValidationError):
             self.client.check_payment(mapped_order_id=None)
 
-    @patch.object(ArzekaPayment, "_ensure_valid_token")
+    @patch.object(OrangeMoneyPayment, "_ensure_valid_token")
     @patch("fasoarzeka.base.requests.Session.post")
     def test_check_payment_success(self, mock_post, mock_ensure):
         """Test de vérification de paiement réussie"""
