@@ -59,6 +59,7 @@ from .constants import (
 )
 from .exceptions import (
     ArzekaAPIError,
+    ArzekaAuthenticationAPIError,
     ArzekaAuthenticationError,
     ArzekaConnectionError,
     ArzekaPaymentError,
@@ -67,8 +68,8 @@ from .exceptions import (
 from .i18n import _
 from .utils import generate_hash_signature, get_reference
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
+# The library never configures logging itself: the application decides
+# (a NullHandler is attached to the package logger in __init__.py).
 logger = logging.getLogger(__name__)
 
 
@@ -114,12 +115,15 @@ class BasePayment:
         """
         session = requests.Session()
 
-        # Configure retry strategy
+        # Configure retry strategy.
+        # Only GET is retried: replaying a POST (e.g. initiate_payment) after a
+        # 5xx or a read timeout could create the same payment twice.
+        # Connection failures (request never sent) are still retried by urllib3.
         retry_strategy = Retry(
             total=MAX_RETRIES,
             backoff_factor=1,
             status_forcelist=[429, 500, 502, 503, 504],
-            allowed_methods=["GET", "POST"],
+            allowed_methods=["GET"],
         )
 
         adapter = HTTPAdapter(max_retries=retry_strategy)
@@ -558,11 +562,22 @@ class ArzekaPayment(BasePayment):
             # Handle authentication errors
             try:
                 error_data = response.json()
-            except requests.exceptions.JSONDecodeError:
+            except ValueError:
                 error_data = {"error": response.text}
-            raise ArzekaAPIError(
-                _("Authentication request failed: %(err)s") % {"err": e},
-                status_code=response.status_code,
+
+            status_code = response.status_code
+            if status_code == 401:
+                message = _("Invalid credentials: username or password is incorrect")
+            elif status_code == 403:
+                message = _("Access forbidden: account may be locked or inactive")
+            else:
+                message = _("Authentication request failed: %(err)s") % {"err": e}
+
+            # Both an ArzekaAuthenticationError and an ArzekaAPIError, so
+            # either except clause keeps working.
+            raise ArzekaAuthenticationAPIError(
+                message,
+                status_code=status_code,
                 response_data=error_data,
             ) from e
 
@@ -619,10 +634,7 @@ class ArzekaPayment(BasePayment):
             ArzekaValidationError: If required parameters are invalid
             ArzekaAPIError: If API request fails
         """
-        # Ensure token is valid before making the request
-        self._ensure_valid_token()
-
-        # Validate inputs
+        # Validate inputs (before any token refresh / network call)
         if not isinstance(amount, (int, float)) or amount <= MINIMUM_AMOUNT:
             raise ArzekaValidationError(
                 _("amount must be a positive number greater than %(min)s")
@@ -669,6 +681,9 @@ class ArzekaPayment(BasePayment):
                     _("When generateReceipt is True, additional_info must contain: %(fields)s")
                     % {"fields": ", ".join(required_receipt_fields)}
                 )
+
+        # Ensure token is valid before making the request
+        self._ensure_valid_token()
 
         # Generate order ID if not provided
         if not mapped_order_id:
@@ -721,11 +736,11 @@ class ArzekaPayment(BasePayment):
             ArzekaValidationError: If order ID is invalid
             ArzekaAPIError: If API request fails
         """
-        # Ensure token is valid before making the request
-        self._ensure_valid_token()
-
         if not mapped_order_id or not isinstance(mapped_order_id, str):
             raise ArzekaValidationError(_("mapped_order_id must be a non-empty string"))
+
+        # Ensure token is valid before making the request
+        self._ensure_valid_token()
 
         logger.info(f"Checking payment status for order: {mapped_order_id}")
 
@@ -766,14 +781,14 @@ class ArzekaPayment(BasePayment):
             ArzekaValidationError: If inputs are invalid
             ArzekaAPIError / ArzekaConnectionError: On request failures
         """
-        # Ensure authentication
-        self._ensure_valid_token()
-
         if not mobile or not isinstance(mobile, str):
             raise ArzekaValidationError(_("mobile must be a non-empty string"))
 
         if not message or not isinstance(message, str):
             raise ArzekaValidationError(_("message must be a non-empty string"))
+
+        # Ensure authentication
+        self._ensure_valid_token()
 
         data: Dict[str, Any] = {"msisdn": mobile, "message": message}
 
@@ -789,9 +804,9 @@ class ArzekaPayment(BasePayment):
         Returns:
             Response data from the SMS status API as a dict
         """
-        self._ensure_valid_token()
-
         if not sms_id or not isinstance(sms_id, str):
             raise ArzekaValidationError(_("sms_id must be a non-empty string"))
+
+        self._ensure_valid_token()
 
         return self.get(SMS_BASE_URL + CHECK_SMS_STATUS + f"?referenceid={sms_id}")

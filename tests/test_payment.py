@@ -355,8 +355,8 @@ class TestArzekaPayment(unittest.TestCase):
             "amount": 1000,
             "merchant_id": "TEST123",
             "additional_info": {
-                "first_name": "John",
-                "last_name": "Doe",
+                "firstname": "John",
+                "lastname": "Doe",
                 "mobile": "70123456",
             },
             "hash_secret": "secret",
@@ -364,10 +364,13 @@ class TestArzekaPayment(unittest.TestCase):
             "link_back_to_calling_website": "https://example.com/return",
         }
 
-        result = self.client.initiate_payment(**payment_data)
+        # initiate_payment returns (api_response, sent_payment_data)
+        result, sent = self.client.initiate_payment(**payment_data)
 
         self.assertEqual(result["status"], "success")
         self.assertIn("mappedOrderId", result)
+        self.assertEqual(sent["merchantId"], "TEST123")
+        self.assertIn("hashString", sent)
         mock_ensure.assert_called_once()
         mock_post.assert_called_once()
 

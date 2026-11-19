@@ -3,10 +3,13 @@ Arzeka Payment API Client
 Unofficial API client for Faso Arzeka mobile money payments in Burkina Faso
 """
 
-from importlib.metadata import version
+import logging
+from importlib.metadata import PackageNotFoundError, version
 
 from .base import ArzekaPayment
 from .exceptions import (
+    ArzekaAPIError,
+    ArzekaAuthenticationAPIError,
     ArzekaAuthenticationError,
     ArzekaConnectionError,
     ArzekaPaymentError,
@@ -24,14 +27,24 @@ from .main import (
 )
 from .utils import format_msisdn, generate_hash_signature, get_reference, validate_phone_number
 
-__version__ = version("fasoarzeka")
+# Libraries must not configure logging: silence "no handler" warnings and
+# let the application decide where logs go.
+logging.getLogger(__name__).addHandler(logging.NullHandler())
+
+try:
+    __version__ = version("fasoarzeka")
+except PackageNotFoundError:  # running from a source checkout, not installed
+    __version__ = "0.0.0+unknown"
+
 __author__ = "Mohamed Zeba (m.zeba@mzeba.dev)"
 __all__ = [
     # Classes
     "ArzekaPayment",
     # Exceptions
-    "ArzekaAuthenticationError",
     "ArzekaPaymentError",
+    "ArzekaAuthenticationError",
+    "ArzekaAuthenticationAPIError",
+    "ArzekaAPIError",
     "ArzekaValidationError",
     "ArzekaConnectionError",
     # Functions

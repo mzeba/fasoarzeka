@@ -37,3 +37,15 @@ class ArzekaAuthenticationError(ArzekaPaymentError):
     """Exception raised when authentication fails"""
 
     pass
+
+
+class ArzekaAuthenticationAPIError(ArzekaAuthenticationError, ArzekaAPIError):
+    """
+    HTTP error returned by the authentication endpoint (401, 403, 5xx...).
+
+    It is both an :class:`ArzekaAuthenticationError` and an
+    :class:`ArzekaAPIError` (with ``status_code`` and ``response_data``), so
+    code catching either exception keeps working.
+    """
+
+    pass
