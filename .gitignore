@@ -58,6 +58,8 @@ cover/
 # Translations
 *.mo
 *.pot
+# Compiled catalogs shipped with the package (needed at runtime)
+!src/fasoarzeka/locales/*/LC_MESSAGES/*.mo
 
 # Django stuff:
 *.log

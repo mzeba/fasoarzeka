@@ -107,6 +107,7 @@ Table des matières
    auto_reauth
    token_validation
    logging
+   i18n
    best_practices
 
 .. toctree::

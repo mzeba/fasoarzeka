@@ -4,6 +4,25 @@ Changelog
 
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
+Version 0.2.0 (non publiée)
+===========================
+
+Fonctionnalités ajoutées
+-------------------------
+
+* 🌍 **Traduction des messages d'erreur** : nouvelle fonction
+  ``install_translations()`` et catalogue français complet (29 messages).
+  Voir :doc:`i18n`. Les messages restent en anglais par défaut.
+* 🛠️ Scripts ``scripts/extract_messages.sh`` et
+  ``scripts/compile_messages.sh`` pour maintenir les traductions.
+
+Modifications
+-------------
+
+* 🧹 Retrait du client Orange Money ajouté par erreur dans ce dépôt
+  (projet distinct). Le package redevient identique à la 0.1.3 publiée,
+  plus la traduction.
+
 Version 3.0.1 (2026-02-23)
 ==========================
 

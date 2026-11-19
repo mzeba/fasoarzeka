@@ -346,6 +346,18 @@ client = ArzekaPayment()
 # Les logs détaillés seront affichés
 ```
 
+### Messages d'erreur en français
+
+Les messages d'erreur sont en anglais par défaut. Pour les afficher en français :
+
+```python
+from fasoarzeka import install_translations
+
+install_translations("fr")  # ou install_translations() pour suivre LANG
+```
+
+Voir la [documentation i18n](https://fasoarzeka.readthedocs.io/fr/latest/i18n.html) pour contribuer une traduction.
+
 ## 🧪 Tests
 
 Le projet inclut des tests unitaires complets :

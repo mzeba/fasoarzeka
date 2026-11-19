@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional, Tuple
 from .base import ArzekaPayment, logger
 from .constants import BASE_URL, DEFAULT_TIMEOUT
 from .exceptions import ArzekaAuthenticationError
+from .i18n import _
 
 # Shared client instance for convenience functions
 _shared_client: Optional[ArzekaPayment] = None
@@ -171,7 +172,7 @@ def initiate_payment(
     # Check if authenticated
     if client._token is None:
         raise ArzekaAuthenticationError(
-            "Not authenticated. Please call authenticate() first."
+            _("Not authenticated. Please call authenticate() first.")
         )
 
     return client.initiate_payment(
@@ -222,7 +223,7 @@ def check_payment(
     # Check if authenticated
     if client._token is None:
         raise ArzekaAuthenticationError(
-            "Not authenticated. Please call authenticate() first."
+            _("Not authenticated. Please call authenticate() first.")
         )
 
     return client.check_payment(mapped_order_id, transaction_id)
@@ -243,7 +244,7 @@ def send_sms(
 
     if client._token is None:
         raise ArzekaAuthenticationError(
-            "Not authenticated. Please call authenticate() first."
+            _("Not authenticated. Please call authenticate() first.")
         )
 
     return client.send_sms(mobile=mobile, message=message)
@@ -259,7 +260,7 @@ def check_sms_status(
 
     if client._token is None:
         raise ArzekaAuthenticationError(
-            "Not authenticated. Please call authenticate() first."
+            _("Not authenticated. Please call authenticate() first.")
         )
 
     return client.check_sms_status(sms_id)

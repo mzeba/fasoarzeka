@@ -6,6 +6,8 @@ import base64
 import hashlib
 from datetime import datetime
 
+from .i18n import _
+
 
 def get_reference() -> str:
     """
@@ -136,9 +138,9 @@ def generate_hash_signature(
     """
     # Input validation
     if not hash_secret:
-        raise ValueError("Secret key cannot be empty or None")
+        raise ValueError(_("Secret key cannot be empty or None"))
     if not isinstance(hash_secret, str):
-        raise TypeError("Secret key must be a string")
+        raise TypeError(_("Secret key must be a string"))
 
     # Merge explicit parameters with kwargs for backward compatibility
     params = {
@@ -182,4 +184,6 @@ def generate_hash_signature(
         signature = base64.b64encode(hash_digest).decode("utf-8")
         return signature
     except Exception as e:
-        raise RuntimeError(f"Failed to generate hash signature: {str(e)}")
+        raise RuntimeError(
+            _("Failed to generate hash signature: %(err)s") % {"err": e}
+        )

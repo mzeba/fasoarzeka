@@ -12,6 +12,7 @@ from .exceptions import (
     ArzekaPaymentError,
     ArzekaValidationError,
 )
+from .i18n import install_translations
 from .main import (
     authenticate,
     check_payment,
@@ -46,4 +47,6 @@ __all__ = [
     "format_msisdn",
     "validate_phone_number",
     "generate_hash_signature",
+    # i18n
+    "install_translations",
 ]

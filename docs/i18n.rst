@@ -1,0 +1,121 @@
+=====================
+Traduction (i18n)
+=====================
+
+Depuis la version 0.2.0, les messages d'erreur de la bibliothèque peuvent être
+affichés en français. Les messages sont écrits en anglais dans le code et
+traduits avec ``gettext``.
+
+Par défaut, **aucune traduction n'est active** : les messages restent en
+anglais, comme dans les versions précédentes.
+
+Activer le français
+===================
+
+Appelez :func:`fasoarzeka.install_translations` une fois, au démarrage de
+votre application :
+
+.. code-block:: python
+
+   from fasoarzeka import ArzekaPayment, ArzekaValidationError, install_translations
+
+   install_translations("fr")
+
+   client = ArzekaPayment()
+   try:
+       client.authenticate("", "password")
+   except ArzekaValidationError as e:
+       print(e)  # Le nom d'utilisateur doit être une chaîne non vide
+
+Les codes régionaux sont acceptés : ``"fr_FR"`` ou ``"fr_BF"`` utilisent le
+catalogue ``fr``.
+
+Langue du système
+-----------------
+
+Sans argument, la langue est lue dans les variables d'environnement
+``LANGUAGE``, ``LC_ALL``, ``LC_MESSAGES`` puis ``LANG`` :
+
+.. code-block:: python
+
+   install_translations()  # avec LANG=fr_FR.UTF-8 -> messages en français
+
+Langue non disponible
+---------------------
+
+Si aucun catalogue n'existe pour la langue demandée, aucune erreur n'est
+levée : les messages restent en anglais.
+
+Portée de la traduction
+=======================
+
+* La traduction est **propre à fasoarzeka** : elle ne modifie ni
+  ``builtins._`` ni le domaine ``gettext`` global de votre application.
+* Elle s'applique aux messages des exceptions (``ArzekaValidationError``,
+  ``ArzekaAuthenticationError``, ``ArzekaConnectionError``,
+  ``ArzekaAPIError``…) et des fonctions utilitaires.
+* Les messages de **log** restent en anglais, pour faciliter la recherche
+  dans les journaux.
+* Le domaine gettext utilisé est ``fasoarzeka``.
+
+Langues disponibles
+===================
+
+========  ==============================
+Code      Langue
+========  ==============================
+``fr``    Français (29 messages, 100 %)
+========  ==============================
+
+Contribuer une traduction
+=========================
+
+Les outils ``gettext`` sont nécessaires (``brew install gettext`` ou
+``apt install gettext``).
+
+1. Extraire les messages et mettre à jour les catalogues existants :
+
+   .. code-block:: bash
+
+      ./scripts/extract_messages.sh
+
+   Le modèle est généré dans ``src/fasoarzeka/locales/fasoarzeka.pot``.
+
+2. Pour une nouvelle langue (exemple : ``en``), créer le catalogue :
+
+   .. code-block:: bash
+
+      mkdir -p src/fasoarzeka/locales/en/LC_MESSAGES
+      msginit --no-translator --locale=en \
+        -i src/fasoarzeka/locales/fasoarzeka.pot \
+        -o src/fasoarzeka/locales/en/LC_MESSAGES/fasoarzeka.po
+
+3. Traduire les entrées ``msgstr`` du fichier ``.po``. Conserver tels quels
+   les paramètres nommés comme ``%(err)s`` ou ``%(timeout)s``.
+
+4. Compiler les catalogues :
+
+   .. code-block:: bash
+
+      ./scripts/compile_messages.sh
+
+   ``msgfmt --check`` vérifie la cohérence des paramètres. Les fichiers
+   ``.po`` **et** ``.mo`` doivent être commités : le ``.mo`` est livré dans
+   le package et lu à l'exécution.
+
+Marquer un nouveau message
+==========================
+
+Dans le code de la bibliothèque, utilisez ``_`` depuis ``fasoarzeka.i18n``
+et des paramètres nommés (jamais de f-string dans ``_()``) :
+
+.. code-block:: python
+
+   from .i18n import _
+
+   raise ArzekaValidationError(
+       _("amount must be a positive number greater than %(min)s")
+       % {"min": MINIMUM_AMOUNT}
+   )
+
+Puis relancez les deux scripts ci-dessus.
