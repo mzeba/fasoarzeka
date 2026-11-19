@@ -18,7 +18,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 description = "API non officielle de paiement mobile pour le service FASO ARZEKA au Burkina Faso"
-authors = [{ name = "Mohamed ZEBA", email = "m.zeba@mzeba.dev" }]
+authors = [{ name = "Mohamed ZEBA", email = "mohamed.zeba@outlook.com" }]
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
 license = "MIT"
