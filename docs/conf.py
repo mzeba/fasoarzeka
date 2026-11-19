@@ -11,7 +11,7 @@ import sys
 
 sys.path.insert(0, os.path.abspath("../src"))
 
-project = "Faso OrangeMoney Payment"
+project = "Faso Arzeka Payment"
 copyright = "2026, Mohamed Zeba"
 author = "Mohamed Zeba"
 release = "0.1.3"

@@ -1,16 +1,16 @@
 """
-OrangeMoney Payment API Client
-Unofficial API client for Faso OrangeMoney mobile money payments in Burkina Faso
+Arzeka Payment API Client
+Unofficial API client for Faso Arzeka mobile money payments in Burkina Faso
 """
 
 from importlib.metadata import version
 
-from .base import OrangeMoneyPayment
+from .base import ArzekaPayment
 from .exceptions import (
-    OrangeMoneyAuthenticationError,
-    OrangeMoneyConnectionError,
-    OrangeMoneyPaymentError,
-    OrangeMoneyValidationError,
+    ArzekaAuthenticationError,
+    ArzekaConnectionError,
+    ArzekaPaymentError,
+    ArzekaValidationError,
 )
 from .main import (
     authenticate,
@@ -21,23 +21,18 @@ from .main import (
     initiate_payment,
     send_sms,
 )
-from .utils import (
-    format_msisdn,
-    generate_hash_signature,
-    get_reference,
-    validate_phone_number,
-)
+from .utils import format_msisdn, generate_hash_signature, get_reference, validate_phone_number
 
 __version__ = version("fasoarzeka")
 __author__ = "Mohamed Zeba (m.zeba@mzeba.dev)"
 __all__ = [
     # Classes
-    "OrangeMoneyPayment",
+    "ArzekaPayment",
     # Exceptions
-    "OrangeMoneyAuthenticationError",
-    "OrangeMoneyPaymentError",
-    "OrangeMoneyValidationError",
-    "OrangeMoneyConnectionError",
+    "ArzekaAuthenticationError",
+    "ArzekaPaymentError",
+    "ArzekaValidationError",
+    "ArzekaConnectionError",
     # Functions
     "initiate_payment",
     "check_payment",

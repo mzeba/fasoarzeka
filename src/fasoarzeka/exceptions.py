@@ -1,26 +1,26 @@
 from typing import Dict, Optional
 
 
-class OrangeMoneyPaymentError(Exception):
-    """Base exception for OrangeMoney payment errors"""
+class ArzekaPaymentError(Exception):
+    """Base exception for Arzeka payment errors"""
 
     pass
 
 
-class OrangeMoneyConnectionError(OrangeMoneyPaymentError):
-    """Exception raised when connection to OrangeMoney API fails"""
+class ArzekaConnectionError(ArzekaPaymentError):
+    """Exception raised when connection to Arzeka API fails"""
 
     pass
 
 
-class OrangeMoneyValidationError(OrangeMoneyPaymentError):
+class ArzekaValidationError(ArzekaPaymentError):
     """Exception raised when payment data validation fails"""
 
     pass
 
 
-class OrangeMoneyAPIError(OrangeMoneyPaymentError):
-    """Exception raised when OrangeMoney API returns an error"""
+class ArzekaAPIError(ArzekaPaymentError):
+    """Exception raised when Arzeka API returns an error"""
 
     def __init__(
         self,
@@ -33,7 +33,7 @@ class OrangeMoneyAPIError(OrangeMoneyPaymentError):
         self.response_data = response_data
 
 
-class OrangeMoneyAuthenticationError(OrangeMoneyPaymentError):
+class ArzekaAuthenticationError(ArzekaPaymentError):
     """Exception raised when authentication fails"""
 
     pass
