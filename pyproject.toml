@@ -3,18 +3,30 @@ name = "fasoarzeka"
 version = "0.2.0"
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Programming Language :: Python :: 3",
+    "Intended Audience :: Developers",
+    "Natural Language :: French",
     "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 description = "API non officielle de paiement mobile pour le service FASO ARZEKA au Burkina Faso"
 authors = [{ name = "Mohamed ZEBA", email = "m.zeba@mzeba.dev" }]
 readme = { file = "README.md", content-type = "text/markdown" }
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 license = "MIT"
 license-files = ["LICENSE"]
 dependencies = ["requests>=2.31.0"]
 keywords = [
-    "fasoarzeka ",
+    "fasoarzeka",
+    "arzeka",
     "burkina payment api",
     "mobile money",
     "payment api",
@@ -22,20 +34,21 @@ keywords = [
 ]
 
 [project.urls]
-Homepage = "https://pypi.org/project/fasoarzeka/"
-Issues = "https://github.com/mzeba/fasoarzeka/issues"
-Repository = "https://github.com/mzeba/fasoarzeka.git"
+Homepage = "https://github.com/mzeba/fasoarzeka"
 Documentation = "https://fasoarzeka.readthedocs.io/fr/latest/"
+Repository = "https://github.com/mzeba/fasoarzeka.git"
+Issues = "https://github.com/mzeba/fasoarzeka/issues"
+Changelog = "https://github.com/mzeba/fasoarzeka/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["setuptools>=77.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.package-data]
-fasoarzeka = ["locales/*/LC_MESSAGES/*.mo", "locales/*/LC_MESSAGES/*.po"]
+fasoarzeka = ["py.typed", "locales/*/LC_MESSAGES/*.mo", "locales/*/LC_MESSAGES/*.po"]
 
 [project.optional-dependencies]
-dev = ["pytest"]
+dev = ["pytest", "coverage"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

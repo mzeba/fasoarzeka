@@ -1,9 +1,9 @@
 # FASO ARZEKA Mobile Money Payment API (Burkina Faso)
 
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/mzeba/fasoarzeka/blob/main/LICENSE)
 
-API client Python non officiel pour les paiements mobiles FASO ARZEKA au Burkina Faso v3.0.1.
+API client Python non officiel pour les paiements mobiles FASO ARZEKA au Burkina Faso.
 Client robuste, production-ready avec gestion automatique des erreurs, retry automatique, et réauthentification automatique.
 
 ## ✨ Fonctionnalités principales
@@ -11,13 +11,14 @@ Client robuste, production-ready avec gestion automatique des erreurs, retry aut
 - ✅ **Authentification sécurisée** avec gestion automatique des tokens
 - ✅ **Réauthentification automatique** quand le token expire
 - ✅ **Gestion complète des erreurs** avec exceptions personnalisées
-- ✅ **Retry automatique** avec backoff exponentiel
+- ✅ **Retry automatique** avec backoff exponentiel (lectures GET uniquement : un paiement n'est jamais renvoyé automatiquement)
 - ✅ **Logging intégré** pour traçabilité complète
 - ✅ **Session persistante** pour meilleures performances
 - ✅ **Type hints complets** pour meilleure auto-complétion
 - ✅ **Context manager** pour gestion automatique des ressources
 - ✅ **Validation des tokens** avec informations d'expiration
-- ✅ **Tests unitaires complets** avec couverture >90%
+- ✅ **Messages d'erreur traduisibles** (français inclus)
+- ✅ **Tests unitaires** (pytest)
 
 ## 📋 Prérequis
 
@@ -29,31 +30,29 @@ Client robuste, production-ready avec gestion automatique des erreurs, retry aut
 
 2. **Certificats SSL** (si fournis par l'opérateur)
 
-3. **Python 3.8 ou supérieur**
+3. **Python 3.10 ou supérieur**
 
 ## 📦 Dépendances
 
 ```txt
 requests>=2.31.0
-setuptools
-urllib3
 ```
 
-Le client nécessite Python 3.8 ou supérieur.
+Le client nécessite Python 3.10 ou supérieur.
 
 ## 🚀 Installation
 
 ```bash
 # Avec pip
-pip install git+https://github.com/mzeba/fasoarzeka.git
+pip install fasoarzeka
 
 # Avec poetry
-poetry add git+https://github.com/mzeba/fasoarzeka.git
+poetry add fasoarzeka
 
 # Installation en mode développement
 git clone https://github.com/mzeba/fasoarzeka.git
 cd fasoarzeka
-pip install -e .
+pip install -e ".[dev]"
 ```
 
 ## 🎯 Guide de démarrage rapide
@@ -312,7 +311,7 @@ ARZEKA_USERNAME=your_username
 ARZEKA_PASSWORD=your_password
 ARZEKA_MERCHANT_ID=MERCHANT_123
 ARZEKA_HASH_SECRET=your_hash_secret
-ARZEKA_BASE_URL=https://pwg-test.fasoarzeka.com/AvepayPaymentGatewayUI/avepay-payment/
+ARZEKA_BASE_URL=https://pgw-test.fasoarzeka.bf/
 ```
 
 ```python
@@ -360,98 +359,68 @@ Voir la [documentation i18n](https://fasoarzeka.readthedocs.io/fr/latest/i18n.ht
 
 ## 🧪 Tests
 
-Le projet inclut des tests unitaires complets :
+Les tests se trouvent dans `tests/` :
 
 ```bash
+# Installer le package avec les dépendances de développement
+pip install -e ".[dev]"
+
 # Exécuter tous les tests
-python -m pytest test/
+python -m pytest
 
-# Exécuter avec couverture
-python -m pytest test/ --cov=arzeka --cov-report=html
+# Exécuter un fichier ou un test précis
+python -m pytest tests/test_payment.py
+python -m pytest tests/test_auth.py::TestAuthentication::test_authenticate_success
 
-# Exécuter un test spécifique
-python -m pytest test/test.py::TestArzekaPayment::test_authenticate
-
-# Mode verbose
-python -m pytest test/ -v
+# Mesurer la couverture
+python -m coverage run -m pytest && python -m coverage report
 ```
 
 ## 📖 Documentation complète
 
-### Documentation style ReadTheDocs
+La documentation complète est en ligne : **https://fasoarzeka.readthedocs.io/fr/latest/**
 
-**📚 Documentation HTML complète disponible dans `docs_sphinx/`**
+- [Installation](https://fasoarzeka.readthedocs.io/fr/latest/installation.html)
+- [Démarrage rapide](https://fasoarzeka.readthedocs.io/fr/latest/quickstart.html)
+- [Authentification](https://fasoarzeka.readthedocs.io/fr/latest/authentication.html)
+- [Paiements](https://fasoarzeka.readthedocs.io/fr/latest/payments.html)
+- [Gestion des erreurs](https://fasoarzeka.readthedocs.io/fr/latest/error_handling.html)
+- [Réauthentification automatique](https://fasoarzeka.readthedocs.io/fr/latest/auto_reauth.html)
+- [Validation des tokens](https://fasoarzeka.readthedocs.io/fr/latest/token_validation.html)
+- [Traduction des messages (i18n)](https://fasoarzeka.readthedocs.io/fr/latest/i18n.html)
+- [Référence API](https://fasoarzeka.readthedocs.io/fr/latest/api_reference.html)
 
-Pour générer et consulter la documentation :
+Pour la générer localement :
 
 ```bash
-cd docs_sphinx
+cd docs
 pip install -r requirements.txt
-./build.sh
+make html
 # Puis ouvrez _build/html/index.html dans votre navigateur
 ```
 
-La documentation comprend :
-
-- Guide d'installation détaillé
-- Guide de démarrage rapide
-- Guide d'authentification complet
-- Référence API complète avec autodoc
-- Exemples de code annotés
-- Guide de gestion d'erreurs
-- Fonctionnalités avancées
-- Guide de contribution
-
-### Guides Markdown
-
-- **[Guide de démarrage rapide](docs/QUICKSTART.md)** - Commencer en 5 minutes
-- **[Guide d'authentification](docs/AUTHENTICATION.md)** - Tout sur l'authentification
-- **[Validation des tokens](docs/TOKEN_VALIDATION.md)** - Gestion des tokens
-- **[Réauthentification automatique](docs/AUTO_REAUTH.md)** - Fonctionnalité avancée
-
-### Exemples de code
-
-- **[Exemples pratiques](examples/)** - Code exécutable
-  - `authentication_example.py` - Exemples d'authentification
-  - `token_validation_example.py` - Validation de tokens
-  - `shared_client_example.py` - Instance partagée
-  - `auto_reauth_example.py` - Réauthentification automatique
-
 ## 🏗️ Architecture
 
-```bash
-arzeka-payment/
-├── src/
-│   └── fasoarzeka/           # Package principal
-│       ├── __init__.py       # Exports publics
-│       ├── arzeka.py         # Module principal
-│       ├── exceptions.py     # Exceptions personnalisées
-│       └── utils.py          # Fonctions utilitaires
-├── test/
-│   ├── __init__.py           # Tests package
-│   └── test.py               # Tests unitaires (authentification & vérification)
-├── docs/
-│   ├── QUICKSTART.md         # Guide de démarrage rapide
-│   ├── AUTHENTICATION.md     # Guide d'authentification
-│   ├── AUTO_REAUTH.md        # Réauthentification automatique
-│   ├── TOKEN_VALIDATION.md   # Validation des tokens
-│   └── MODIFICATIONS_SUMMARY.md  # Résumé des modifications
-├── examples/
-│   ├── authentication_example.py      # Exemples d'authentification
-│   ├── auto_reauth_example.py         # Réauthentification automatique
-│   ├── shared_client_example.py       # Instance partagée
-│   ├── token_validation_example.py    # Validation de tokens
-│   ├── example.py                     # Exemple simple
-│   ├── test_auto_reauth.py            # Test réauthentification
-│   └── test_signature_improvements.py # Test signatures améliorées
-├── CHANGELOG.md              # Historique des modifications
-├── INSTALLATION_GUIDE.md     # Guide d'installation détaillé
-├── LICENSE                   # Licence MIT
-├── README.md                 # Ce fichier
-├── requirements.txt          # Dépendances du projet
-├── setup.py                  # Configuration setuptools
-├── setup.cfg                 # Configuration additionnelle
-└── pyproject.toml            # Configuration Poetry
+```text
+fasoarzeka/
+├── src/fasoarzeka/           # Package publié sur PyPI
+│   ├── __init__.py           # Exports publics
+│   ├── base.py               # BasePayment et ArzekaPayment (client)
+│   ├── main.py               # Fonctions de convenance (client partagé)
+│   ├── constants.py          # URL, endpoints, valeurs par défaut
+│   ├── exceptions.py         # Exceptions personnalisées
+│   ├── utils.py              # Fonctions utilitaires (référence, signature…)
+│   ├── i18n.py               # Traduction des messages d'erreur
+│   ├── locales/              # Catalogues de traduction (.po / .mo)
+│   └── py.typed              # Marqueur PEP 561 (type hints)
+├── tests/                    # Tests unitaires (pytest)
+├── docs/                     # Documentation Sphinx (Read the Docs)
+├── scripts/                  # Outils de traduction (extraction / compilation)
+├── .github/workflows/        # CI : tests et publication PyPI
+├── CHANGELOG.md
+├── LICENSE
+├── README.md
+└── pyproject.toml            # Métadonnées et configuration de build
 ```
 
 ## 🔧 Classes et Exceptions
@@ -611,11 +580,13 @@ class ArzekaPayment(base_url: str = BASE_URL, timeout: int = 30)
 - ✅ Gestion complète des erreurs
 - ✅ Retry automatique
 - ✅ Réauthentification automatique
-- ✅ Tests unitaires (>90% couverture)
+- ✅ Envoi et suivi de SMS
+- ✅ Messages d'erreur traduisibles (français)
+- ✅ Tests unitaires
 - ✅ Documentation complète
 - ✅ Type hints complets
 - ✅ Logging intégré
-- ⏳ Publication sur PyPI (à venir)
+- ✅ Publié sur PyPI
 
 ## 🤝 Contribution
 
@@ -636,11 +607,11 @@ Les contributions sont les bienvenues ! Voici comment contribuer :
 
 ## 📝 Changelog
 
-Voir [CHANGELOG.md](CHANGELOG.md) pour l'historique détaillé des modifications.
+Voir le [changelog](https://fasoarzeka.readthedocs.io/fr/latest/changelog.html) pour l'historique détaillé des modifications.
 
 ## 📄 Licence
 
-Ce projet est sous licence MIT. Voir le fichier [LICENSE](LICENSE) pour plus de détails.
+Ce projet est sous licence MIT. Voir le fichier [LICENSE](https://github.com/mzeba/fasoarzeka/blob/main/LICENSE) pour plus de détails.
 
 ## 👥 Auteur
 
@@ -675,5 +646,5 @@ Pour la production, assurez-vous de configurer l'URL de production :
 ```python
 from fasoarzeka import ArzekaPayment
 
-client = ArzekaPayment(base_url="https://pwg.fasoarzeka.com/...")
+client = ArzekaPayment(base_url="https://pgw.fasoarzeka.bf/")
 ```

@@ -119,7 +119,7 @@ Un dictionnaire contenant :
 
    {
        "mappedOrderId": "ORDER-2026-001",
-       "url": "https://pwg.fasoarzeka.com/payment/abc123",
+       "url": "https://pgw.fasoarzeka.bf/payment/abc123",
        "qrcode": "data:image/png;base64,iVBORw0KGgo...",
        "status": "PENDING"
    }

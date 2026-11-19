@@ -40,7 +40,7 @@ Authentification
    auth = authenticate(
        username="votre_username",
        password="votre_password",
-       base_url="https://pwg-test.fasoarzeka.com/"
+       base_url="https://pgw-test.fasoarzeka.bf/"
    )
 
    print(f"Token : {auth['access_token']}")
@@ -139,7 +139,7 @@ Le context manager gère automatiquement l'ouverture et la fermeture de la sessi
 
    from fasoarzeka import ArzekaPayment
 
-   with ArzekaPayment(base_url="https://pwg-test.fasoarzeka.com/") as client:
+   with ArzekaPayment(base_url="https://pgw-test.fasoarzeka.bf/") as client:
        # 1. S'authentifier
        auth = client.authenticate("votre_username", "votre_password")
 
@@ -174,7 +174,7 @@ Si vous préférez gérer manuellement le cycle de vie du client :
    from fasoarzeka import ArzekaPayment
 
    # Créer le client
-   client = ArzekaPayment(base_url="https://pwg-test.fasoarzeka.com/")
+   client = ArzekaPayment(base_url="https://pgw-test.fasoarzeka.bf/")
 
    try:
        # S'authentifier

@@ -64,7 +64,7 @@ Langues disponibles
 ========  ==============================
 Code      Langue
 ========  ==============================
-``fr``    Français (29 messages, 100 %)
+``fr``    Français (31 messages, 100 %)
 ========  ==============================
 
 Contribuer une traduction

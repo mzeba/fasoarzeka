@@ -18,7 +18,7 @@ Classe principale pour interagir avec l'API Faso Arzeka.
 
    client = ArzekaPayment(
        token="",
-       base_url="https://pwg-test.fasoarzeka.com/",
+       base_url="https://pgw-test.fasoarzeka.bf/",
        timeout=30,
        max_retries=3,
        verify_ssl=True

@@ -96,7 +96,7 @@ Exemple d'utilisation
    auth = authenticate(
        username="votre_username",
        password="votre_password",
-       base_url="https://pwg-test.fasoarzeka.com/"
+       base_url="https://pgw-test.fasoarzeka.bf/"
    )
 
    # Afficher les informations
@@ -252,7 +252,7 @@ Exemple 4 : Authentification avec configuration depuis l'environnement
    # Lire les identifiants depuis les variables d'environnement
    username = os.getenv('ARZEKA_USERNAME')
    password = os.getenv('ARZEKA_PASSWORD')
-   base_url = os.getenv('ARZEKA_BASE_URL', 'https://pwg-test.fasoarzeka.com/')
+   base_url = os.getenv('ARZEKA_BASE_URL', 'https://pgw-test.fasoarzeka.bf/')
 
    # Vérifier que les identifiants sont définis
    if not username or not password:
@@ -359,7 +359,7 @@ Définir les variables d'environnement :
 
    export ARZEKA_USERNAME="votre_username"
    export ARZEKA_PASSWORD="votre_password"
-   export ARZEKA_BASE_URL="https://pwg-test.fasoarzeka.com/"
+   export ARZEKA_BASE_URL="https://pgw-test.fasoarzeka.bf/"
 
 **Fichier .env :**
 
@@ -367,7 +367,7 @@ Définir les variables d'environnement :
 
    ARZEKA_USERNAME=votre_username
    ARZEKA_PASSWORD=votre_password
-   ARZEKA_BASE_URL=https://pwg-test.fasoarzeka.com/
+   ARZEKA_BASE_URL=https://pgw-test.fasoarzeka.bf/
 
 Puis avec python-dotenv :
 

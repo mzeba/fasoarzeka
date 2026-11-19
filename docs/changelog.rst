@@ -11,14 +11,39 @@ Fonctionnalités ajoutées
 -------------------------
 
 * 🌍 **Traduction des messages d'erreur** : nouvelle fonction
-  ``install_translations()`` et catalogue français complet (29 messages).
+  ``install_translations()`` et catalogue français complet (31 messages).
   Voir :doc:`i18n`. Les messages restent en anglais par défaut.
 * 🛠️ Scripts ``scripts/extract_messages.sh`` et
   ``scripts/compile_messages.sh`` pour maintenir les traductions.
 
+Corrections
+-----------
+
+* 🛡️ **Plus aucune requête POST n'est renvoyée automatiquement** : seules les
+  lectures (GET) sont retentées. Rejouer ``initiate_payment`` après une erreur
+  5xx ou un délai dépassé pouvait créer deux fois le même paiement.
+* 🪵 La bibliothèque n'appelle plus ``logging.basicConfig()`` à l'import :
+  la configuration des logs revient à l'application.
+* 📦 Suppression de la contrainte ``urllib3<1.27``, qui rétrogradait urllib3
+  et cassait les paquets exigeant urllib3 2.x.
+* 🔐 Les erreurs HTTP de l'authentification lèvent
+  ``ArzekaAuthenticationAPIError``, qui est à la fois une
+  ``ArzekaAuthenticationError`` et une ``ArzekaAPIError`` (avec
+  ``status_code``). Messages explicites pour les codes 401 et 403.
+* ✅ Les paramètres sont validés **avant** le rafraîchissement du token :
+  une donnée invalide n'entraîne plus d'appel réseau.
+* ``ArzekaAPIError`` est désormais exportée par le package
+  (``from fasoarzeka import ArzekaAPIError``), comme le montrait la doc.
+* 📚 Correction des URL de l'API dans la documentation
+  (``pgw-test.fasoarzeka.bf`` / ``pgw.fasoarzeka.bf``).
+
 Modifications
 -------------
 
+* ⬆️ **Python 3.10 ou supérieur requis.** Sous Python 3.8 et 3.9, pip
+  installe automatiquement la version 0.1.3.
+* 🏷️ Ajout du marqueur ``py.typed`` : les type hints sont pris en compte par
+  mypy et pyright.
 * 🧹 Retrait du client Orange Money ajouté par erreur dans ce dépôt
   (projet distinct). Le package redevient identique à la 0.1.3 publiée,
   plus la traduction.

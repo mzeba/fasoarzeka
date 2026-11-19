@@ -56,13 +56,13 @@ Sécurité
 
    # ✅ BON - Production
    client = ArzekaPayment(
-       base_url="https://pwg.fasoarzeka.com/",
+       base_url="https://pgw.fasoarzeka.bf/",
        verify_ssl=True
    )
 
    # ⚠️ Acceptable seulement en test
    client = ArzekaPayment(
-       base_url="https://pwg-test.fasoarzeka.com/",
+       base_url="https://pgw-test.fasoarzeka.bf/",
        verify_ssl=False  # Uniquement en test !
    )
 
@@ -269,7 +269,7 @@ Structure du code
        password: str = os.getenv('ARZEKA_PASSWORD', '')
        merchant_id: str = os.getenv('ARZEKA_MERCHANT_ID', '')
        hash_secret: str = os.getenv('ARZEKA_HASH_SECRET', '')
-       base_url: str = os.getenv('ARZEKA_BASE_URL', 'https://pwg-test.fasoarzeka.com/')
+       base_url: str = os.getenv('ARZEKA_BASE_URL', 'https://pgw-test.fasoarzeka.bf/')
        webhook_url: str = os.getenv('ARZEKA_WEBHOOK_URL', '')
        return_url: str = os.getenv('ARZEKA_RETURN_URL', '')
 
@@ -458,7 +458,7 @@ Tests
    # tests/conftest.py
    import os
 
-   os.environ['ARZEKA_BASE_URL'] = 'https://pwg-test.fasoarzeka.com/'
+   os.environ['ARZEKA_BASE_URL'] = 'https://pgw-test.fasoarzeka.bf/'
    os.environ['ARZEKA_USERNAME'] = 'test_user'
    os.environ['ARZEKA_PASSWORD'] = 'test_pass'
 

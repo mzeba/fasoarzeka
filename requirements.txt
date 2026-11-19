@@ -1,4 +1,0 @@
-# Arzeka Payment API Client Requirements
-requests>=2.31.0
-setuptools
-urllib3

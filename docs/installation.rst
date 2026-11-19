@@ -26,7 +26,9 @@ En environnement de production, des certificats SSL peuvent être fournis par l'
 Version Python
 --------------
 
-Cette bibliothèque nécessite **Python 3.8 ou supérieur**.
+Cette bibliothèque nécessite **Python 3.10 ou supérieur** depuis la version 0.2.0.
+Sous Python 3.8 ou 3.9, ``pip`` installe automatiquement la dernière version
+compatible (0.1.3).
 
 Vérifiez votre version de Python :
 
@@ -39,19 +41,11 @@ Vérifiez votre version de Python :
 Dépendances
 ===========
 
-Les dépendances suivantes seront installées automatiquement :
+La seule dépendance, installée automatiquement, est :
 
-* **requests** >= 2.31.0 : Pour les requêtes HTTP
-* **setuptools** : Pour l'installation du package
-* **urllib3** : Pour la gestion des connexions HTTP
+* **requests** >= 2.31.0 : pour les requêtes HTTP (elle installe elle-même ``urllib3``)
 
-Toutes les dépendances sont listées dans le fichier ``requirements.txt`` :
-
-.. code-block:: text
-
-   requests>=2.31.0
-   setuptools
-   urllib3
+Les dépendances sont déclarées dans ``pyproject.toml``.
 
 Installation
 ============
@@ -59,8 +53,15 @@ Installation
 Installation avec pip (recommandé)
 -----------------------------------
 
-Depuis GitHub
-^^^^^^^^^^^^^
+Depuis PyPI
+^^^^^^^^^^^
+
+.. code-block:: bash
+
+   pip install fasoarzeka
+
+Depuis GitHub (version en développement)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
@@ -80,7 +81,7 @@ Si vous utilisez Poetry pour la gestion des dépendances :
 
 .. code-block:: bash
 
-   poetry add git+https://github.com/mzeba/fasoarzeka.git
+   poetry add fasoarzeka
 
 Installation en mode développement
 -----------------------------------
@@ -144,7 +145,7 @@ Vous pouvez configurer certains paramètres via des variables d'environnement :
 
    export ARZEKA_TOKEN="votre_token"
    export ARZEKA_MERCHANT_ID="votre_merchant_id"
-   export ARZEKA_BASE_URL="https://pwg-test.fasoarzeka.com/"
+   export ARZEKA_BASE_URL="https://pgw-test.fasoarzeka.bf/"
    export ARZEKA_HASH_SECRET="votre_hash_secret"
 
 Ces variables peuvent être utilisées dans votre code :
@@ -171,7 +172,7 @@ Vous pouvez également créer un fichier de configuration ``arzeka_config.py`` :
    ARZEKA_PASSWORD = "votre_password"
    ARZEKA_MERCHANT_ID = "MERCHANT_123"
    ARZEKA_HASH_SECRET = "votre_secret"
-   ARZEKA_BASE_URL = "https://pwg-test.fasoarzeka.com/"
+   ARZEKA_BASE_URL = "https://pgw-test.fasoarzeka.bf/"
 
 .. warning::
    **Sécurité** : Ne commitez jamais vos identifiants dans un dépôt Git !
@@ -183,8 +184,13 @@ Environnements de test et production
 URLs des environnements
 -----------------------
 
-* **Test** : ``https://pwg-test.fasoarzeka.com/``
-* **Production** : ``https://pwg.fasoarzeka.com/``
+* **Test** : ``https://pgw-test.fasoarzeka.bf/`` (valeur par défaut du client)
+* **Production** : ``https://pgw.fasoarzeka.bf/``
+
+.. important::
+   Le client utilise l'environnement de **test** par défaut. En production,
+   passez explicitement ``base_url`` et vérifiez l'URL de production avec
+   Faso Arzeka lors de la remise de vos identifiants.
 
 .. tip::
    Commencez toujours par tester votre intégration en environnement de test avant de passer en production.
@@ -202,9 +208,9 @@ Exemple de configuration multi-environnements
 
    # Configuration selon l'environnement
    if ENV == 'production':
-       BASE_URL = "https://pwg.fasoarzeka.com/"
+       BASE_URL = "https://pgw.fasoarzeka.bf/"
    else:
-       BASE_URL = "https://pwg-test.fasoarzeka.com/"
+       BASE_URL = "https://pgw-test.fasoarzeka.bf/"
 
    client = ArzekaPayment(base_url=BASE_URL)
 
