@@ -455,10 +455,12 @@ PaymentStatus
 
 Statuts renvoyés par ``check_payment()`` dans le champ ``status`` :
 
+* ``PaymentStatus.INIT`` (``"INIT"``) : paiement créé, page jamais ouverte
+  (non documenté officiellement, mais renvoyé par la passerelle)
+* ``PaymentStatus.INCOMPLETE`` (``"INCOMPLETE"``) : page ouverte, paiement non abouti
+* ``PaymentStatus.PENDING`` (``"PENDING"``) : paiement en cours de traitement
 * ``PaymentStatus.COMPLETED`` (``"COMPLETED"``) : paiement réussi
-* ``PaymentStatus.PENDING`` (``"PENDING"``) : paiement en cours
-* ``PaymentStatus.INCOMPLETE`` (``"INCOMPLETE"``) : paiement non abouti
-* ``PaymentStatus.ALL`` : les trois statuts
+* ``PaymentStatus.ALL`` : les quatre statuts
 
 URL des environnements
 ----------------------

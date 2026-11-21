@@ -39,9 +39,14 @@ def ok_response(payload):
     return response
 
 
-def http_error(status_code):
-    response = Mock(status_code=status_code, text="error")
-    response.json.return_value = {"error": "x"}
+def http_error(status_code, body=None):
+    """HTTP error response. body=None mimics the gateway's empty body
+    (what it sends for a rejected token: 403 with no content)."""
+    response = Mock(status_code=status_code, text="" if body is None else json.dumps(body))
+    if body is None:
+        response.json.side_effect = ValueError("empty body")
+    else:
+        response.json.return_value = body
     response.raise_for_status.side_effect = requests.exceptions.HTTPError(
         f"{status_code} Error"
     )
@@ -224,6 +229,20 @@ class TestReauthenticationOn403(AuthenticatedClientTestCase):
                 self.client.check_payment(DOC_ORDER_ID)
         auth.assert_not_called()
 
+    def test_403_with_error_message_is_not_a_token_problem(self):
+        """Observed on the test gateway: an invalid hash answers
+        403 {"error": "Invalid hashString"}; re-authenticating would not help."""
+        self.client._username, self.client._password = "user", "pwd"
+        rejected = http_error(403, {"error": "Invalid hashString"})
+        with patch("requests.Session.post", return_value=rejected) as post, patch.object(
+            ArzekaPayment, "authenticate"
+        ) as auth:
+            with self.assertRaises(ArzekaAPIError) as ctx:
+                self.initiate()
+        auth.assert_not_called()
+        self.assertEqual(post.call_count, 1)
+        self.assertEqual(ctx.exception.response_data, {"error": "Invalid hashString"})
+
     def test_other_errors_do_not_reauthenticate(self):
         self.client._username, self.client._password = "user", "pwd"
         with patch("requests.Session.post", return_value=http_error(404)), patch.object(
@@ -242,7 +261,10 @@ class TestReferencesAndStatuses(unittest.TestCase):
         self.assertEqual(len({get_reference() for _ in range(1000)}), 1000)
 
     def test_payment_statuses(self):
-        self.assertEqual(set(PaymentStatus.ALL), {"COMPLETED", "INCOMPLETE", "PENDING"})
+        # INIT is not in the official documentation but is returned by the gateway
+        self.assertEqual(
+            set(PaymentStatus.ALL), {"INIT", "INCOMPLETE", "PENDING", "COMPLETED"}
+        )
 
 
 class TestPaymentRequestId(unittest.TestCase):

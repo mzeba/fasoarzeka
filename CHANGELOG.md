@@ -18,11 +18,12 @@ Le détail est aussi disponible dans la
 - Exception `ArzekaAuthenticationAPIError`, à la fois `ArzekaAuthenticationError` et
   `ArzekaAPIError`, levée pour les erreurs HTTP de l'authentification (401, 403, 5xx).
 - Export de `ArzekaAPIError` depuis le package.
-- Constantes `PaymentStatus` (`COMPLETED`, `INCOMPLETE`, `PENDING`), `TEST_BASE_URL`
+- Constantes `PaymentStatus` (`INIT`, `INCOMPLETE`, `PENDING`, `COMPLETED`), `TEST_BASE_URL`
   et `PRODUCTION_BASE_URL`, conformes à la documentation officielle de la passerelle.
 - `get_payment_request_id()` : lit la référence (`paymentRequestId`) au retour sur
   le site marchand.
-- Ré-authentification automatique (une seule fois) quand la passerelle répond 403.
+- Ré-authentification automatique (une seule fois) quand la passerelle refuse le
+  jeton (403 sans message d'erreur).
 - `initiate_payment()` accepte les montants `Decimal`.
 
 ### Corrigé

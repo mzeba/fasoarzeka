@@ -29,6 +29,9 @@ Le processus de réauthentification automatique suit ces étapes :
    **une seule fois** et renvoie la requête. Un 403 signifie que la requête a été
    refusée sans être traitée : la renvoyer ne crée pas de double paiement.
    Un second 403 est levé normalement (``ArzekaAPIError``, ``status_code == 403``).
+   Un 403 accompagné d'un message d'erreur (par exemple
+   ``{"error": "Invalid hashString"}`` pour un hash invalide) n'est pas un
+   problème de jeton : il est levé immédiatement, sans ré-authentification.
 
 .. note::
    Les credentials sont stockés uniquement en mémoire, jamais sur disque.

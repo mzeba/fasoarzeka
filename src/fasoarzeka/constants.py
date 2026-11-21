@@ -16,13 +16,21 @@ CHECK_SMS_STATUS = "checkSms"
 
 
 class PaymentStatus:
-    """Payment statuses returned by check_payment() in the ``status`` field."""
+    """
+    Payment statuses returned by check_payment() in the ``status`` field.
 
-    COMPLETED = "COMPLETED"  # payment succeeded
-    INCOMPLETE = "INCOMPLETE"  # payment not completed (abandoned, failed...)
+    Lifecycle observed on the gateway: INIT (created, payment page never
+    opened) -> INCOMPLETE (page opened, not paid) -> PENDING -> COMPLETED.
+    INIT is not listed in the official documentation (v2.0) but is returned
+    by the gateway.
+    """
+
+    INIT = "INIT"  # payment created, payment page not opened yet
+    INCOMPLETE = "INCOMPLETE"  # payment not completed (page opened, abandoned, failed...)
     PENDING = "PENDING"  # payment in progress
+    COMPLETED = "COMPLETED"  # payment succeeded
 
-    ALL = (COMPLETED, INCOMPLETE, PENDING)
+    ALL = (INIT, INCOMPLETE, PENDING, COMPLETED)
 
 
 DEFAULT_TIMEOUT = 30

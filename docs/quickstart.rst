@@ -347,11 +347,9 @@ Exemple 2 : Vérification périodique du statut
    for attempt in range(max_attempts):
        status = check_payment(order_id)
 
+       # INIT / INCOMPLETE / PENDING : l'utilisateur peut encore payer
        if status['status'] == PaymentStatus.COMPLETED:
            print("✅ Paiement réussi !")
-           break
-       elif status['status'] == PaymentStatus.INCOMPLETE:
-           print("❌ Paiement non abouti")
            break
        else:
            print(f"⏳ En attente... (tentative {attempt + 1}/{max_attempts})")

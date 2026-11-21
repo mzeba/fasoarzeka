@@ -245,12 +245,18 @@ Utilisez les constantes de :class:`fasoarzeka.PaymentStatus` :
 
    * - Statut
      - Description
+   * - ``PaymentStatus.INIT``
+     - Paiement créé, page de paiement jamais ouverte (statut non listé dans la
+       documentation officielle, mais renvoyé par la passerelle)
+   * - ``PaymentStatus.INCOMPLETE``
+     - Page de paiement ouverte, paiement non abouti (en cours, abandonné ou échoué)
+   * - ``PaymentStatus.PENDING``
+     - Paiement en cours de traitement
    * - ``PaymentStatus.COMPLETED``
      - Paiement réussi
-   * - ``PaymentStatus.PENDING``
-     - Paiement en cours
-   * - ``PaymentStatus.INCOMPLETE``
-     - Paiement non abouti (abandonné ou échoué)
+
+Cycle observé : ``INIT`` → ``INCOMPLETE`` (dès l'ouverture de la page) →
+``PENDING`` → ``COMPLETED``. Seul ``COMPLETED`` confirme le paiement.
 
 Exemple de vérification périodique
 -----------------------------------
@@ -265,11 +271,9 @@ Exemple de vérification périodique
        for attempt in range(max_attempts):
            status = check_payment(order_id)
 
+           # INIT / INCOMPLETE / PENDING : l'utilisateur peut encore payer
            if status['status'] == PaymentStatus.COMPLETED:
                print("✅ Paiement réussi !")
-               return status
-           elif status['status'] == PaymentStatus.INCOMPLETE:
-               print("❌ Paiement non abouti")
                return status
            else:
                print(f"⏳ En attente... (tentative {attempt + 1}/{max_attempts})")

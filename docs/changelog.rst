@@ -15,12 +15,13 @@ Fonctionnalités ajoutées
   Voir :doc:`i18n`. Les messages restent en anglais par défaut.
 * 🛠️ Scripts ``scripts/extract_messages.sh`` et
   ``scripts/compile_messages.sh`` pour maintenir les traductions.
-* 📌 Constantes ``PaymentStatus`` (``COMPLETED``, ``INCOMPLETE``, ``PENDING``),
+* 📌 Constantes ``PaymentStatus`` (``INIT``, ``INCOMPLETE``, ``PENDING``, ``COMPLETED``),
   ``TEST_BASE_URL`` et ``PRODUCTION_BASE_URL``, conformes à la documentation
   officielle de la passerelle.
 * ↩️ ``get_payment_request_id()`` : lit la référence (``paymentRequestId``) au
   retour sur le site marchand. Voir :doc:`payments`.
-* 🔁 Ré-authentification automatique (une seule fois) quand la passerelle répond 403.
+* 🔁 Ré-authentification automatique (une seule fois) quand la passerelle refuse
+  le jeton (403 sans message d'erreur).
 * 💰 ``initiate_payment()`` accepte les montants ``Decimal``.
 
 Corrections

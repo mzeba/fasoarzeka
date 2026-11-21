@@ -325,14 +325,27 @@ class ArzekaPayment(BasePayment):
         """
         Make an API request, re-authenticating once if the token is rejected.
 
-        The gateway answers 403 when the token is invalid (e.g. revoked before
-        its expiry date). The request was refused, not processed, so it is
-        safe to authenticate again with the stored credentials and retry it once.
+        The gateway answers 403 with an empty body when the token is invalid
+        (e.g. revoked before its expiry date). The request was refused, not
+        processed, so it is safe to authenticate again with the stored
+        credentials and retry it once.
+
+        A 403 carrying an error message (e.g. ``{"error": "Invalid hashString"}``)
+        is a business error, not a token problem: it is raised immediately.
         """
         try:
             return super()._make_request(method, endpoint, data, params, **kwargs)
         except ArzekaAPIError as e:
-            if e.status_code != 403 or not (self._username and self._password):
+            error_message = (
+                e.response_data.get("error")
+                if isinstance(e.response_data, dict)
+                else None
+            )
+            if (
+                e.status_code != 403
+                or error_message
+                or not (self._username and self._password)
+            ):
                 raise
             logger.warning("Token rejected (403), re-authenticating once")
             self.authenticate(self._username, self._password)
