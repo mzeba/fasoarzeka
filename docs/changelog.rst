@@ -4,8 +4,8 @@ Changelog
 
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
-Version 0.2.0 (non publiée)
-===========================
+Version 0.2.0 (2026-11-21)
+==========================
 
 Fonctionnalités ajoutées
 -------------------------
@@ -64,9 +64,6 @@ Modifications
   mypy et pyright.
 * 🆔 ``get_reference()`` génère un UUID4 (comme les exemples officiels) au lieu
   de ``AAMMJJ.HHMMSS.microsecondes``, pour éviter les collisions entre serveurs.
-* 🧹 Retrait du client Orange Money ajouté par erreur dans ce dépôt
-  (projet distinct). Le package redevient identique à la 0.1.3 publiée,
-  plus la traduction.
 
 Version 3.0.1 (2026-02-23)
 ==========================

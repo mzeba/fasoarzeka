@@ -7,7 +7,7 @@ respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 Le détail est aussi disponible dans la
 [documentation](https://fasoarzeka.readthedocs.io/fr/latest/changelog.html).
 
-## [0.2.0] - non publiée
+## [0.2.0] - 2026-11-21
 
 ### Ajouté
 
@@ -55,10 +55,6 @@ Le détail est aussi disponible dans la
 - `get_reference()` génère un UUID4 (comme les exemples officiels) au lieu de
   `AAMMJJ.HHMMSS.microsecondes`, pour éviter les collisions entre serveurs.
 
-### Retiré
-
-- Client Orange Money ajouté par erreur dans ce dépôt (projet distinct).
-
 ## [0.1.3] - 2026-02-23
 
 ## [0.1.2] - 2026-01-25
@@ -71,7 +67,7 @@ Le détail est aussi disponible dans la
 
 - Première publication sur PyPI.
 
-[0.2.0]: https://github.com/mzeba/fasoarzeka/compare/0.1.3...HEAD
+[0.2.0]: https://github.com/mzeba/fasoarzeka/compare/0.1.3...0.2.0
 [0.1.3]: https://pypi.org/project/fasoarzeka/0.1.3/
 [0.1.2]: https://pypi.org/project/fasoarzeka/0.1.2/
 [0.1.1]: https://pypi.org/project/fasoarzeka/0.1.1/
