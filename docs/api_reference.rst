@@ -97,28 +97,33 @@ Initialise un nouveau paiement.
 
    def initiate_payment(
        self,
-       amount: int,
+       amount: int | float | Decimal,
        merchant_id: str,
-       additional_info: Dict[str, str],
-       hash_secret: str,
        link_for_update_status: str,
        link_back_to_calling_website: str,
+       additional_info: Dict[str, Any],
+       hash_secret: str,
        mapped_order_id: Optional[str] = None,
-       order_description: Optional[str] = None
-   ) -> Dict[str, Any]
+   ) -> Tuple[Dict[str, Any], Dict[str, Any]]
 
 **Paramètres:**
 
-* ``amount`` (int) : Montant en FCFA (minimum 100)
-* ``merchant_id`` (str) : Identifiant marchand
-* ``additional_info`` (dict) : Informations client (first_name, last_name, mobile)
+* ``amount`` (int, float ou Decimal) : Montant en FCFA (minimum 100)
+* ``merchant_id`` (str) : Identifiant marchand (20 caractères maximum)
+* ``additional_info`` (dict) : Informations client. ``firstname``, ``lastname``
+  et ``mobile`` sont obligatoires. Pour une quittance du Trésor :
+  ``generateReceipt=True``, ``paymentDescription``, ``accountingOffice``,
+  ``accountantName`` (``address`` facultatif). Le dict passé n'est pas modifié.
 * ``hash_secret`` (str) : Clé secrète pour le hash
-* ``link_for_update_status`` (str) : URL du webhook
-* ``link_back_to_calling_website`` (str) : URL de retour
-* ``mapped_order_id`` (str, optionnel) : ID de commande personnalisé
-* ``order_description`` (str, optionnel) : Description de la commande
+* ``link_for_update_status`` (str) : URL de votre backend appelée après le paiement
+* ``link_back_to_calling_website`` (str) : URL de retour du navigateur après le paiement
+* ``mapped_order_id`` (str, optionnel) : Référence de commande, 50 caractères
+  maximum (UUID généré si absent)
 
-**Retour:** Dictionnaire avec ``mappedOrderId``, ``url``, ``qrcode``, ``status``
+**Retour:** Tuple ``(response, payment_data)`` :
+
+* ``response`` : réponse de l'API, ``{"url": "<page de paiement>"}``
+* ``payment_data`` : champs envoyés à l'API, dont ``mappedOrderId`` et ``hashString``
 
 **Exceptions:**
 
@@ -131,12 +136,12 @@ Initialise un nouveau paiement.
 
 .. code-block:: python
 
-   response = client.initiate_payment(
+   response, payment_data = client.initiate_payment(
        amount=1000,
        merchant_id="MERCHANT_123",
        additional_info={
-           "first_name": "Jean",
-           "last_name": "Dupont",
+           "firstname": "Jean",
+           "lastname": "Dupont",
            "mobile": "22670123456"
        },
        hash_secret="secret",
@@ -151,13 +156,16 @@ Vérifie le statut d'un paiement.
 
 .. code-block:: python
 
-   def check_payment(self, mapped_order_id: str) -> Dict[str, Any]
+   def check_payment(self, mapped_order_id: str, transaction_id: str = None) -> Dict[str, Any]
 
 **Paramètres:**
 
-* ``mapped_order_id`` (str) : ID de la commande
+* ``mapped_order_id`` (str) : Référence de la commande
+* ``transaction_id`` (str, optionnel) : Référence de la transaction de paiement
 
-**Retour:** Dictionnaire avec ``mappedOrderId``, ``status``, ``amount``, ``orderDate``, etc.
+**Retour:** Dictionnaire avec ``status`` (voir :ref:`payment-status`), ``amount``,
+``order_id``, ``merchant_id``, ``third_party_module``, ``third_party_trans_id``,
+``created_at``, ``additionalInfo``…
 
 **Exceptions:**
 
@@ -169,8 +177,11 @@ Vérifie le statut d'un paiement.
 
 .. code-block:: python
 
+   from fasoarzeka import PaymentStatus
+
    status = client.check_payment("ORDER-2026-001")
-   print(status['status'])
+   if status['status'] == PaymentStatus.COMPLETED:
+       print("Paiement confirmé")
 
 is_token_valid()
 """"""""""""""""
@@ -278,19 +289,20 @@ Fonction pour initier un paiement rapidement.
 
    from fasoarzeka import initiate_payment
 
-   def initiate_payment(payment_data: Dict[str, Any]) -> Dict[str, Any]
+   def initiate_payment(payment_data: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]
 
 **Paramètres:**
 
-* ``payment_data`` (dict) : Dictionnaire contenant tous les paramètres du paiement
+* ``payment_data`` (dict) : Dictionnaire contenant les paramètres de
+  :meth:`ArzekaPayment.initiate_payment` (``amount``, ``merchant_id``…)
 
-**Retour:** Dictionnaire de réponse
+**Retour:** Tuple ``(response, payment_data)``, comme la méthode de classe
 
 **Exemple:**
 
 .. code-block:: python
 
-   response = initiate_payment({
+   response, payment_data = initiate_payment({
        "amount": 1000,
        "merchant_id": "MERCHANT_123",
        # ... autres paramètres
@@ -305,11 +317,12 @@ Fonction pour vérifier un paiement rapidement.
 
    from fasoarzeka import check_payment
 
-   def check_payment(mapped_order_id: str) -> Dict[str, Any]
+   def check_payment(mapped_order_id: str, transaction_id: str = None) -> Dict[str, Any]
 
 **Paramètres:**
 
-* ``mapped_order_id`` (str) : ID de la commande
+* ``mapped_order_id`` (str) : Référence de la commande
+* ``transaction_id`` (str, optionnel) : Référence de la transaction de paiement
 
 **Retour:** Dictionnaire de statut
 
@@ -372,34 +385,92 @@ Valide un numéro de téléphone.
    if validate_phone_number("22670123456"):
        print("Numéro valide")
 
-generate_hash()
----------------
+generate_hash_signature()
+-------------------------
 
-Génère un hash pour sécuriser les transactions.
+Calcule le ``hashString`` d'un paiement selon l'algorithme officiel :
+``SHA256("amount|merchantId|mappedOrderId|linkBackToCallingWebsite|linkForUpdateStatus|additionalInfo|hashSecret")``
+encodé en Base64. ``initiate_payment()`` l'appelle automatiquement.
 
 .. code-block:: python
 
-   from fasoarzeka.utils import generate_hash
+   from fasoarzeka import generate_hash_signature
 
-   def generate_hash(
-       mapped_order_id: str,
-       amount: int,
-       hash_secret: str
+   def generate_hash_signature(
+       hash_secret: str,
+       amount: str,
+       merchantId: str,
+       mappedOrderId: str,
+       linkBackToCallingWebsite: str,
+       linkForUpdateStatus: str,
+       additionalInfo: str,
    ) -> str
+
+Les liens sont attendus **déjà encodés en Base64** et ``additionalInfo`` sous
+forme de chaîne JSON, exactement comme ils sont envoyés à l'API.
+
+get_reference()
+---------------
+
+Génère une référence de commande unique (UUID4), utilisée comme
+``mappedOrderId`` quand vous n'en fournissez pas.
+
+.. code-block:: python
+
+   from fasoarzeka import get_reference
+
+   order_id = get_reference()
+   # "9b1248cc-dad4-4f1e-baa1-16410de1ecec"
+
+get_payment_request_id()
+------------------------
+
+Extrait la référence de commande du retour sur le site marchand
+(``?paymentRequestId=...``, nom reconnu quelle que soit sa casse).
+
+.. code-block:: python
+
+   from fasoarzeka import get_payment_request_id
+
+   def get_payment_request_id(query: str | Mapping[str, Any]) -> Optional[str]
 
 **Paramètres:**
 
-* ``mapped_order_id`` (str) : ID de commande
-* ``amount`` (int) : Montant
-* ``hash_secret`` (str) : Clé secrète
+* ``query`` : URL complète, chaîne de requête, ou dictionnaire de paramètres
+  (``request.args`` avec Flask, ``request.GET`` avec Django)
 
-**Retour:** Hash calculé
+**Retour:** La référence (``mappedOrderId``), ou ``None`` si absente
 
-**Exemple:**
+.. warning::
+   Cette valeur vient du navigateur et peut être falsifiée : confirmez
+   toujours le paiement avec ``check_payment()``.
+
+Constantes
+==========
+
+.. _payment-status:
+
+PaymentStatus
+-------------
+
+Statuts renvoyés par ``check_payment()`` dans le champ ``status`` :
+
+* ``PaymentStatus.COMPLETED`` (``"COMPLETED"``) : paiement réussi
+* ``PaymentStatus.PENDING`` (``"PENDING"``) : paiement en cours
+* ``PaymentStatus.INCOMPLETE`` (``"INCOMPLETE"``) : paiement non abouti
+* ``PaymentStatus.ALL`` : les trois statuts
+
+URL des environnements
+----------------------
+
+* ``TEST_BASE_URL`` : ``https://pgw-test.fasoarzeka.bf/`` (valeur par défaut)
+* ``PRODUCTION_BASE_URL`` : ``https://pgw.fasoarzeka.bf/``
 
 .. code-block:: python
 
-   hash_value = generate_hash("ORDER-001", 1000, "secret")
+   from fasoarzeka import PRODUCTION_BASE_URL, ArzekaPayment
+
+   client = ArzekaPayment(base_url=PRODUCTION_BASE_URL)
 
 Voir aussi
 ==========

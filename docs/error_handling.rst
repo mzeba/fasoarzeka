@@ -32,8 +32,8 @@ Validez les données avant de les envoyer à l'API.
                amount=amount,
                merchant_id=merchant_id,
                additional_info={
-                   "first_name": "Client",
-                   "last_name": "Test",
+                   "firstname": "Client",
+                   "lastname": "Test",
                    "mobile": phone
                },
                # ... autres paramètres
@@ -154,7 +154,7 @@ Erreurs de validation
        client.authenticate("username", "password")
 
        try:
-           response = client.initiate_payment(
+           response, payment_data = client.initiate_payment(
                amount=50,  # Trop petit
                merchant_id="MERCHANT_123",
                # ...
@@ -162,7 +162,7 @@ Erreurs de validation
        except ArzekaValidationError as e:
            print(f"Données invalides : {e}")
            # Corriger les données
-           response = client.initiate_payment(
+           response, payment_data = client.initiate_payment(
                amount=100,  # Corrigé
                merchant_id="MERCHANT_123",
                # ...
@@ -285,11 +285,11 @@ Pour les opérations complexes :
 
                # Niveau 2 : Validation
                try:
-                   response = client.initiate_payment(**payment_data)
+                   response, payment_data = client.initiate_payment(**payment_data)
                except ArzekaValidationError as e:
                    # Corriger et réessayer
                    payment_data['amount'] = max(payment_data['amount'], 100)
-                   response = client.initiate_payment(**payment_data)
+                   response, payment_data = client.initiate_payment(**payment_data)
 
                return response
 
@@ -380,7 +380,7 @@ Flask
            if not client.is_token_valid():
                client.authenticate("username", "password")
 
-           response = client.initiate_payment(
+           response, payment_data = client.initiate_payment(
                amount=data['amount'],
                merchant_id=data['merchant_id'],
                # ... autres paramètres
@@ -422,7 +422,7 @@ Django
                if not self.client.is_token_valid():
                    self.client.authenticate("username", "password")
 
-               response = self.client.initiate_payment(
+               response, payment_data = self.client.initiate_payment(
                    amount=request.POST['amount'],
                    merchant_id=request.POST['merchant_id'],
                    # ...
@@ -501,7 +501,7 @@ Métriques personnalisées
        try:
            with ArzekaPayment() as client:
                client.authenticate("username", "password")
-               response = client.initiate_payment(...)
+               response, payment_data = client.initiate_payment(...)
 
            payment_requests.labels(status='success').inc()
            return response

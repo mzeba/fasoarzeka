@@ -35,9 +35,11 @@ Note:
 import base64
 import json
 import logging
+import math
 from datetime import datetime, timezone
+from decimal import Decimal
 from typing import Any, Dict, Optional, Tuple
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 
 import requests
 from requests.adapters import HTTPAdapter
@@ -312,6 +314,30 @@ class ArzekaPayment(BasePayment):
         """
         super().__init__(base_url, timeout)
 
+    def _make_request(
+        self,
+        method: str,
+        endpoint: str,
+        data: Optional[Dict[str, Any]] = None,
+        params: Optional[Dict[str, Any]] = None,
+        **kwargs,
+    ) -> Dict[str, Any]:
+        """
+        Make an API request, re-authenticating once if the token is rejected.
+
+        The gateway answers 403 when the token is invalid (e.g. revoked before
+        its expiry date). The request was refused, not processed, so it is
+        safe to authenticate again with the stored credentials and retry it once.
+        """
+        try:
+            return super()._make_request(method, endpoint, data, params, **kwargs)
+        except ArzekaAPIError as e:
+            if e.status_code != 403 or not (self._username and self._password):
+                raise
+            logger.warning("Token rejected (403), re-authenticating once")
+            self.authenticate(self._username, self._password)
+            return super()._make_request(method, endpoint, data, params, **kwargs)
+
     def is_token_valid(self, margin_seconds: int = EXPIRATION_MARGIN_SECONDS) -> bool:
         """
         Check if the authentication token is still valid
@@ -569,7 +595,9 @@ class ArzekaPayment(BasePayment):
             if status_code == 401:
                 message = _("Invalid credentials: username or password is incorrect")
             elif status_code == 403:
-                message = _("Access forbidden: account may be locked or inactive")
+                message = _(
+                    "Access forbidden: invalid credentials or account locked/inactive"
+                )
             else:
                 message = _("Authentication request failed: %(err)s") % {"err": e}
 
@@ -628,25 +656,35 @@ class ArzekaPayment(BasePayment):
 
 
         Returns:
-            url: URL to redirect user for payment
+            Tuple ``(response, payment_data)``:
+
+            - ``response``: API response, ``{"url": "<payment page URL>"}``.
+              Redirect the user's browser to ``response["url"]``.
+            - ``payment_data``: the form fields sent to the API (including
+              ``mappedOrderId`` and ``hashString``), useful to store the order.
 
         Raises:
             ArzekaValidationError: If required parameters are invalid
             ArzekaAPIError: If API request fails
         """
         # Validate inputs (before any token refresh / network call)
-        if not isinstance(amount, (int, float)) or amount <= MINIMUM_AMOUNT:
+        if (
+            isinstance(amount, bool)
+            or not isinstance(amount, (int, float, Decimal))
+            or not math.isfinite(amount)
+            or amount < MINIMUM_AMOUNT
+        ):
             raise ArzekaValidationError(
-                _("amount must be a positive number greater than %(min)s")
+                _("amount must be a number greater than or equal to %(min)s")
                 % {"min": MINIMUM_AMOUNT}
             )
 
         if not merchant_id or not isinstance(merchant_id, (str, int)):
             raise ArzekaValidationError(_("merchant_id must be a non-empty string/int"))
 
-        if not set(["firstname", "lastname", "mobile"]).issubset(
-            additional_info.keys()
-        ):
+        if not isinstance(additional_info, dict) or not set(
+            ["firstname", "lastname", "mobile"]
+        ).issubset(additional_info.keys()):
             raise ArzekaValidationError(
                 _("additional_info must contain firstname, lastname, and mobile")
             )
@@ -661,6 +699,9 @@ class ArzekaPayment(BasePayment):
                     "additional_info fields firstname, lastname, and mobile cannot be empty or null"
                 )
             )
+
+        # Work on a copy: never modify the caller's dictionary
+        additional_info = dict(additional_info)
 
         if "generateReceipt" not in additional_info:
             additional_info["generateReceipt"] = False
@@ -730,11 +771,15 @@ class ArzekaPayment(BasePayment):
             **kwargs: Additional parameters
 
         Returns:
-            Payment status data
+            Payment data, notably ``status`` (see :class:`PaymentStatus`:
+            ``COMPLETED``, ``INCOMPLETE`` or ``PENDING``), ``amount``,
+            ``order_id``, ``merchant_id``, ``third_party_module``,
+            ``third_party_trans_id``, ``created_at`` and ``additionalInfo``.
 
         Raises:
             ArzekaValidationError: If order ID is invalid
-            ArzekaAPIError: If API request fails
+            ArzekaAPIError: If API request fails (status_code 404 when the
+                order does not exist)
         """
         if not mapped_order_id or not isinstance(mapped_order_id, str):
             raise ArzekaValidationError(_("mapped_order_id must be a non-empty string"))
@@ -744,15 +789,11 @@ class ArzekaPayment(BasePayment):
 
         logger.info(f"Checking payment status for order: {mapped_order_id}")
 
-        # Prepare query parameters
-        url = (
-            PAYMENT_BASE_URL
-            + PAYMENT_VERIFICATION_ENDPOINT
-            + f"?mappedOrderId={mapped_order_id}"
-        )
-
+        # Prepare query parameters (URL-encoded: references may contain & + # ...)
+        query = {"mappedOrderId": mapped_order_id}
         if transaction_id:
-            url += f"&transId={transaction_id}"
+            query["transId"] = transaction_id
+        url = PAYMENT_BASE_URL + PAYMENT_VERIFICATION_ENDPOINT + "?" + urlencode(query)
 
         # Make API request
         response = self.post(url)

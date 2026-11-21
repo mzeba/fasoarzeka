@@ -68,8 +68,13 @@ with ArzekaPayment() as client:
     )
 ```
 
-En production, passez explicitement l'URL de production
-(`ArzekaPayment(base_url="https://pgw.fasoarzeka.bf/")`) et vérifiez-la avec Faso Arzeka.
+En production, passez explicitement l'URL de production :
+
+```python
+from fasoarzeka import PRODUCTION_BASE_URL, ArzekaPayment
+
+client = ArzekaPayment(base_url=PRODUCTION_BASE_URL)  # https://pgw.fasoarzeka.bf/
+```
 
 ## Messages d'erreur en français
 

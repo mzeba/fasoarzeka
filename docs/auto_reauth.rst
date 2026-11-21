@@ -24,6 +24,11 @@ Le processus de réauthentification automatique suit ces étapes :
 2. **Vérification automatique** : Avant chaque requête, le client vérifie si le token est valide
 3. **Réauthentification** : Si le token est expiré, le client se réauthentifie automatiquement
 4. **Exécution** : La requête est ensuite exécutée avec le nouveau token
+5. **Jeton refusé (403)** : Si la passerelle rejette malgré tout le jeton (par
+   exemple révoqué avant sa date d'expiration), le client se réauthentifie
+   **une seule fois** et renvoie la requête. Un 403 signifie que la requête a été
+   refusée sans être traitée : la renvoyer ne crée pas de double paiement.
+   Un second 403 est levé normalement (``ArzekaAPIError``, ``status_code == 403``).
 
 .. note::
    Les credentials sont stockés uniquement en mémoire, jamais sur disque.
@@ -87,7 +92,7 @@ C'est la méthode recommandée pour bénéficier de la réauthentification autom
    # La réauthentification se fait automatiquement si nécessaire
 
    # Première requête (token valide)
-   response1 = client.initiate_payment(
+   response1, _ = client.initiate_payment(
        amount=1000,
        merchant_id="MERCHANT_123",
        # ... autres paramètres
@@ -96,7 +101,7 @@ C'est la méthode recommandée pour bénéficier de la réauthentification autom
    # ... le temps passe, le token expire ...
 
    # Deuxième requête (token expiré → réauthentification automatique)
-   response2 = client.initiate_payment(
+   response2, _ = client.initiate_payment(
        amount=2000,
        merchant_id="MERCHANT_123",
        # ... autres paramètres
@@ -120,7 +125,7 @@ Avec Context Manager
 
        # Faire plusieurs opérations
        for i in range(10):
-           response = client.initiate_payment(...)
+           response, payment_data = client.initiate_payment(...)
            print(f"Paiement {i+1} initié")
 
            # Simuler un délai
@@ -201,7 +206,7 @@ Exemple 2 : API REST avec Flask
 
        try:
            # Le client se réauthentifie automatiquement si nécessaire
-           response = client.initiate_payment(
+           response, payment_data = client.initiate_payment(
                amount=data['amount'],
                merchant_id=data['merchant_id'],
                additional_info=data['additional_info'],
@@ -257,7 +262,7 @@ Exemple 3 : Worker de traitement en arrière-plan
 
        try:
            # Initier le paiement (réauth auto si nécessaire)
-           response = arzeka_client.initiate_payment(
+           response, payment_data = arzeka_client.initiate_payment(
                amount=payment['amount'],
                merchant_id=payment['merchant_id'],
                # ... autres paramètres
@@ -293,7 +298,7 @@ Sans réauthentification automatique (ancien code)
        print("Token expiré, réauthentification...")
        client.authenticate("username", "password")
 
-   response = client.initiate_payment(...)
+   response, payment_data = client.initiate_payment(...)
 
    # ... plus tard ...
 
@@ -317,7 +322,7 @@ Avec réauthentification automatique (nouveau code)
    client.authenticate("username", "password")
 
    # Pas besoin de vérifier, c'est automatique !
-   response = client.initiate_payment(...)
+   response, payment_data = client.initiate_payment(...)
 
    # ... plus tard ...
 
@@ -343,7 +348,7 @@ Si vous appelez ``initiate_payment()`` ou ``check_payment()`` sans vous être au
    # Pas d'authentification !
 
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaAuthenticationError as e:
        print(f"❌ Erreur : {e}")
        # → "Token expired and no credentials stored for re-authentication"
@@ -354,7 +359,7 @@ Si vous appelez ``initiate_payment()`` ou ``check_payment()`` sans vous être au
 
    client = ArzekaPayment()
    client.authenticate("username", "password")  # ✅
-   response = client.initiate_payment(...)
+   response, payment_data = client.initiate_payment(...)
 
 Erreur : Credentials invalides
 -------------------------------
@@ -369,7 +374,7 @@ Si les credentials stockés deviennent invalides (changement de mot de passe) :
    # ... le mot de passe est changé sur le serveur ...
 
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaAuthenticationError as e:
        print(f"❌ Réauthentification échouée : {e}")
        # Mettre à jour les credentials

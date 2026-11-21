@@ -15,6 +15,13 @@ Fonctionnalités ajoutées
   Voir :doc:`i18n`. Les messages restent en anglais par défaut.
 * 🛠️ Scripts ``scripts/extract_messages.sh`` et
   ``scripts/compile_messages.sh`` pour maintenir les traductions.
+* 📌 Constantes ``PaymentStatus`` (``COMPLETED``, ``INCOMPLETE``, ``PENDING``),
+  ``TEST_BASE_URL`` et ``PRODUCTION_BASE_URL``, conformes à la documentation
+  officielle de la passerelle.
+* ↩️ ``get_payment_request_id()`` : lit la référence (``paymentRequestId``) au
+  retour sur le site marchand. Voir :doc:`payments`.
+* 🔁 Ré-authentification automatique (une seule fois) quand la passerelle répond 403.
+* 💰 ``initiate_payment()`` accepte les montants ``Decimal``.
 
 Corrections
 -----------
@@ -36,6 +43,17 @@ Corrections
   (``from fasoarzeka import ArzekaAPIError``), comme le montrait la doc.
 * 📚 Correction des URL de l'API dans la documentation
   (``pgw-test.fasoarzeka.bf`` / ``pgw.fasoarzeka.bf``).
+* 🔗 ``check_payment()`` encode les paramètres de l'URL : une référence contenant
+  ``&``, ``+``, ``#`` ou un espace vérifiait une autre commande.
+* ``initiate_payment()`` ne modifie plus le dict ``additional_info`` de l'appelant.
+* Le montant minimum (100 FCFA) est désormais inclusif ; ``bool``, NaN et
+  l'infini sont refusés.
+* 📚 Documentation alignée sur l'API officielle : ``initiate_payment()`` renvoie
+  un tuple ``(response, payment_data)`` (les exemples faisant ``response['url']``
+  plantaient), champs ``firstname`` / ``lastname``, vrais champs de réponse et
+  vrais statuts ; suppression des fonctions, paramètres et champs inexistants
+  (``generate_hash``, ``generate_order_id``, ``order_description``, ``qrcode``,
+  statuts ``FAILED`` / ``CANCELLED``…).
 
 Modifications
 -------------
@@ -44,6 +62,8 @@ Modifications
   installe automatiquement la version 0.1.3.
 * 🏷️ Ajout du marqueur ``py.typed`` : les type hints sont pris en compte par
   mypy et pyright.
+* 🆔 ``get_reference()`` génère un UUID4 (comme les exemples officiels) au lieu
+  de ``AAMMJJ.HHMMSS.microsecondes``, pour éviter les collisions entre serveurs.
 * 🧹 Retrait du client Orange Money ajouté par erreur dans ce dépôt
   (projet distinct). Le package redevient identique à la 0.1.3 publiée,
   plus la traduction.

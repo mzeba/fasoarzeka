@@ -71,8 +71,8 @@ Exemple simple
        "amount": 1000,
        "merchant_id": "MERCHANT_123",
        "additional_info": {
-           "first_name": "Jean",
-           "last_name": "Dupont",
+           "firstname": "Jean",
+           "lastname": "Dupont",
            "mobile": "22670123456"
        },
        "hash_secret": "votre_secret",
@@ -80,11 +80,11 @@ Exemple simple
        "link_back_to_calling_website": "https://exemple.com/retour"
    }
 
-   response = initiate_payment(payment_data)
+   response, sent = initiate_payment(payment_data)
    print(f"URL de paiement: {response['url']}")
 
    # 3. Vérifier le statut
-   status = check_payment(payment_data['mapped_order_id'])
+   status = check_payment(sent['mappedOrderId'])
    print(f"Statut: {status['status']}")
 
 Table des matières

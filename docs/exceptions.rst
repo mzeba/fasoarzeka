@@ -63,7 +63,7 @@ Levée lorsque les données fournies sont invalides.
 
    try:
        # Montant trop petit
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=50,  # < 100 FCFA
            merchant_id="MERCHANT_123",
            # ... autres paramètres
@@ -102,12 +102,12 @@ Levée lors d'un échec d'authentification.
 .. code-block:: python
 
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaAuthenticationError as e:
        # Token expiré et pas de credentials stockés
        print(f"Réauthentification requise : {e}")
        client.authenticate("username", "password")
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
 
 ArzekaAPIError
 ==============
@@ -151,7 +151,7 @@ Levée lorsque l'API Arzeka retourne une erreur.
 .. code-block:: python
 
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaAPIError as e:
        if e.status_code == 400:
            print("Requête invalide")
@@ -218,12 +218,12 @@ Levée lorsqu'une requête dépasse le timeout configuré.
    client = ArzekaPayment(timeout=5)  # 5 secondes
 
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaTimeoutError as e:
        print(f"Timeout : {e}")
        # Réessayer avec un timeout plus long
        client.timeout = 30
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
 
 Gestion globale des erreurs
 ============================
@@ -241,7 +241,7 @@ Capturer toutes les exceptions Arzeka :
 
    try:
        client.authenticate("username", "password")
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaPaymentError as e:
        print(f"Erreur : {e}")
        # Logger l'erreur
@@ -267,7 +267,7 @@ Gérer chaque type d'erreur différemment :
 
    try:
        client.authenticate("username", "password")
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=1000,
            merchant_id="MERCHANT_123",
            # ... autres paramètres
@@ -363,7 +363,7 @@ Configuration de base
 
    try:
        client.authenticate("username", "password")
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaPaymentError as e:
        logger.error(f"Arzeka error: {e}", exc_info=True)
 
@@ -380,7 +380,7 @@ Logging détaillé par type d'erreur
    )
 
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaValidationError as e:
        logger.warning(f"Validation error: {e}")
    except ArzekaAuthenticationError as e:
@@ -405,7 +405,7 @@ Meilleures pratiques
 
       # ✅ BON
       try:
-           response = client.initiate_payment(...)
+           response, payment_data = client.initiate_payment(...)
        except ArzekaValidationError:
            # Gérer erreur de validation
        except ArzekaAPIError:
@@ -413,7 +413,7 @@ Meilleures pratiques
 
       # ❌ MAUVAIS
       try:
-           response = client.initiate_payment(...)
+           response, payment_data = client.initiate_payment(...)
        except Exception:
            # Trop général
 
@@ -424,7 +424,7 @@ Meilleures pratiques
       import logging
 
       try:
-           response = client.initiate_payment(...)
+           response, payment_data = client.initiate_payment(...)
        except ArzekaPaymentError as e:
            logger.error(f"Payment failed: {e}", exc_info=True)
            raise
@@ -434,7 +434,7 @@ Meilleures pratiques
    .. code-block:: python
 
       try:
-           response = client.initiate_payment(...)
+           response, payment_data = client.initiate_payment(...)
        except ArzekaValidationError:
            return "Vérifiez vos informations de paiement"
        except ArzekaConnectionError:

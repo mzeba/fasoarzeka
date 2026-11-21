@@ -155,7 +155,7 @@ Logs de paiement
 
 .. code-block:: python
 
-   response = client.initiate_payment(
+   response, payment_data = client.initiate_payment(
        amount=1000,
        merchant_id="MERCHANT_123",
        # ...
@@ -426,7 +426,7 @@ Bonnes pratiques
       import time
 
       start_time = time.time()
-      response = client.initiate_payment(...)
+      response, payment_data = client.initiate_payment(...)
       duration = time.time() - start_time
 
       logger.info(f"Payment completed in {duration:.2f}s")

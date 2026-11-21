@@ -27,12 +27,12 @@ Deux méthodes pour initier un paiement
 
    from fasoarzeka import initiate_payment
 
-   response = initiate_payment({
+   response, payment_data = initiate_payment({
        "amount": 1000,
        "merchant_id": "MERCHANT_123",
        "additional_info": {
-           "first_name": "Jean",
-           "last_name": "Dupont",
+           "firstname": "Jean",
+           "lastname": "Dupont",
            "mobile": "22670123456"
        },
        "mapped_order_id": "ORDER-2026-001",
@@ -50,12 +50,12 @@ Deux méthodes pour initier un paiement
    with ArzekaPayment() as client:
        client.authenticate("username", "password")
 
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=1000,
            merchant_id="MERCHANT_123",
            additional_info={
-               "first_name": "Jean",
-               "last_name": "Dupont",
+               "firstname": "Jean",
+               "lastname": "Dupont",
                "mobile": "22670123456"
            },
            mapped_order_id="ORDER-2026-001",
@@ -82,7 +82,7 @@ Paramètres requis
      - Votre identifiant marchand unique
    * - ``additional_info``
      - ``dict``
-     - Informations du client (first_name, last_name, mobile)
+     - Informations du client (firstname, lastname, mobile)
    * - ``hash_secret``
      - ``str``
      - Votre clé secrète pour la génération de hash
@@ -105,24 +105,32 @@ Paramètres optionnels
      - Description
    * - ``mapped_order_id``
      - ``str``
-     - ID unique de votre commande (généré automatiquement si absent)
-   * - ``order_description``
-     - ``str``
-     - Description de la commande
+     - Référence unique de votre commande, 50 caractères maximum
+       (UUID généré automatiquement si absent)
 
-Réponse de l'API
+Pour obtenir une quittance du Trésor, ajoutez dans ``additional_info`` :
+``generateReceipt: True``, ``paymentDescription``, ``accountingOffice`` et
+``accountantName`` (``address`` est facultatif).
+
+Valeur de retour
 ----------------
 
-Un dictionnaire contenant :
+``initiate_payment()`` renvoie un **tuple** ``(response, payment_data)`` :
+
+* ``response`` : la réponse de l'API, qui contient uniquement l'URL de la page
+  de paiement vers laquelle rediriger le navigateur de l'utilisateur ;
+* ``payment_data`` : les données envoyées à l'API, dont ``mappedOrderId``
+  (à conserver pour vérifier le paiement) et ``hashString``.
 
 .. code-block:: python
 
-   {
-       "mappedOrderId": "ORDER-2026-001",
-       "url": "https://pgw.fasoarzeka.bf/payment/abc123",
-       "qrcode": "data:image/png;base64,iVBORw0KGgo...",
-       "status": "PENDING"
-   }
+   response, payment_data = client.initiate_payment(...)
+
+   response
+   # {"url": "https://pgw-test.fasoarzeka.bf/AvepayPaymentGatewayUI/avepay-payment/app/initializePayment?id=a58b81bb-..."}
+
+   payment_data["mappedOrderId"]
+   # "9b1248cc-dad4-4f1e-baa1-16410de1ecec"
 
 Exemple complet
 ---------------
@@ -140,17 +148,16 @@ Exemple complet
        order_id = f"ORDER-{uuid.uuid4().hex[:10]}"
 
        # Initier le paiement
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=5000,  # 5000 FCFA
            merchant_id="MERCHANT_123",
            additional_info={
-               "first_name": "Marie",
-               "last_name": "Kaboré",
+               "firstname": "Marie",
+               "lastname": "Kaboré",
                "mobile": "22670123456",
                "email": "marie@example.com"  # Optionnel
            },
            mapped_order_id=order_id,
-           order_description="Achat de produits",
            hash_secret="votre_hash_secret",
            link_for_update_status="https://monsite.com/api/webhook",
            link_back_to_calling_website="https://monsite.com/success"
@@ -159,8 +166,8 @@ Exemple complet
        # Afficher l'URL de paiement
        print(f"Redirigez l'utilisateur vers : {response['url']}")
 
-       # Stocker l'order_id dans votre base de données
-       # save_to_database(order_id, response)
+       # Stocker la référence dans votre base de données
+       # save_to_database(payment_data["mappedOrderId"], response["url"])
 
 Vérifier un paiement
 ====================
@@ -201,7 +208,10 @@ Paramètres
      - Description
    * - ``mapped_order_id``
      - ``str``
-     - L'ID de commande retourné lors de l'initiation
+     - La référence de commande (``payment_data["mappedOrderId"]``)
+   * - ``transaction_id``
+     - ``str``, optionnel
+     - Référence de la transaction de paiement (``transId``)
 
 Réponse de l'API
 ----------------
@@ -209,31 +219,38 @@ Réponse de l'API
 .. code-block:: python
 
    {
-       "mappedOrderId": "ORDER-2026-001",
-       "status": "COMPLETED",  # ou PENDING, FAILED, CANCELLED
-       "amount": 1000,
-       "orderDate": "2026-02-23T10:30:00",
-       "paymentDate": "2026-02-23T10:35:00",
-       "transactionId": "TX123456789"
+       "id": 12960,
+       "order_id": "714ceca9-2a0a-423a-8700-bda1df8ac641",
+       "merchant_id": "1",
+       "status": "COMPLETED",
+       "third_party_module": "...",          # moyen de paiement utilisé
+       "third_party_mapped_order_id": "9ee6f3e4-c4d6-4859-b11d-ccfd1e45e258",
+       "third_party_redirect_url": "...",
+       "third_party_trans_id": "...",
+       "created_at": "2025-07-11",
+       "amount": "1000",
+       "additionalInfo": "{\"firstname\":\"Test\",\"lastname\":\"Test\",\"mobile\":\"22612345678\"}"
    }
+
+Une commande inconnue lève ``ArzekaAPIError`` avec ``status_code == 404``.
 
 Statuts possibles
 -----------------
 
+Utilisez les constantes de :class:`fasoarzeka.PaymentStatus` :
+
 .. list-table::
    :header-rows: 1
-   :widths: 20 80
+   :widths: 30 70
 
    * - Statut
      - Description
-   * - ``PENDING``
-     - Paiement en attente, l'utilisateur n'a pas encore payé
-   * - ``COMPLETED``
-     - Paiement réussi et confirmé
-   * - ``FAILED``
-     - Paiement échoué (fonds insuffisants, annulation, etc.)
-   * - ``CANCELLED``
-     - Paiement annulé par l'utilisateur ou le système
+   * - ``PaymentStatus.COMPLETED``
+     - Paiement réussi
+   * - ``PaymentStatus.PENDING``
+     - Paiement en cours
+   * - ``PaymentStatus.INCOMPLETE``
+     - Paiement non abouti (abandonné ou échoué)
 
 Exemple de vérification périodique
 -----------------------------------
@@ -241,21 +258,18 @@ Exemple de vérification périodique
 .. code-block:: python
 
    import time
-   from fasoarzeka import check_payment
+   from fasoarzeka import PaymentStatus, check_payment
 
    def wait_for_payment(order_id, max_attempts=20, delay=5):
        """Attendre qu'un paiement soit complété"""
        for attempt in range(max_attempts):
            status = check_payment(order_id)
 
-           if status['status'] == 'COMPLETED':
+           if status['status'] == PaymentStatus.COMPLETED:
                print("✅ Paiement réussi !")
                return status
-           elif status['status'] == 'FAILED':
-               print("❌ Paiement échoué")
-               return status
-           elif status['status'] == 'CANCELLED':
-               print("⚠️ Paiement annulé")
+           elif status['status'] == PaymentStatus.INCOMPLETE:
+               print("❌ Paiement non abouti")
                return status
            else:
                print(f"⏳ En attente... (tentative {attempt + 1}/{max_attempts})")
@@ -267,37 +281,69 @@ Exemple de vérification périodique
    # Utilisation
    result = wait_for_payment("ORDER-2026-001")
 
-Webhooks
-========
+Retour sur le site marchand
+===========================
 
-Les webhooks permettent de recevoir des notifications en temps réel lorsque le statut d'un paiement change.
+Après le paiement, la passerelle redirige le navigateur de l'utilisateur vers
+``link_back_to_calling_website`` en ajoutant la référence de commande :
 
-Configuration du webhook
--------------------------
+.. code-block:: text
 
-Lors de l'initiation du paiement, spécifiez l'URL de votre webhook :
+   GET <link_back_to_calling_website>?paymentRequestId=9b1248cc-dad4-4f1e-baa1-16410de1ecec
+
+``get_payment_request_id()`` extrait cette référence (le nom du paramètre est
+reconnu quelle que soit sa casse : ``paymentRequestId`` ou ``paymentRequestID``) :
 
 .. code-block:: python
 
-   response = client.initiate_payment(
+   from flask import Flask, request
+   from fasoarzeka import PaymentStatus, check_payment, get_payment_request_id
+
+   app = Flask(__name__)
+
+   @app.route('/retour')
+   def retour_paiement():
+       order_id = get_payment_request_id(request.args)   # ou request.url
+       if order_id is None:
+           return "Référence de paiement absente", 400
+
+       # Le paramètre vient du navigateur et peut être falsifié :
+       # toujours confirmer côté serveur.
+       status = check_payment(order_id)
+       if status['status'] == PaymentStatus.COMPLETED:
+           return "Merci, paiement confirmé !"
+       return "Paiement non confirmé"
+
+.. warning::
+   Ne vous fiez jamais uniquement aux paramètres de l'URL de retour : ils
+   peuvent être manipulés. Vérifiez toujours le paiement avec ``check_payment()``.
+
+Notification serveur (``link_for_update_status``)
+=================================================
+
+``link_for_update_status`` est l'URL de votre backend que la passerelle appelle
+après le paiement.
+
+.. note::
+   La documentation officielle de FASO ARZEKA **ne décrit pas le contenu** de
+   cet appel. Ne dépendez donc pas de son format : placez vous-même la
+   référence de commande dans l'URL, puis vérifiez le statut avec
+   ``check_payment()``.
+
+Configuration
+-------------
+
+.. code-block:: python
+
+   from urllib.parse import quote
+   from fasoarzeka import get_reference
+
+   order_id = get_reference()
+   response, payment_data = client.initiate_payment(
        # ... autres paramètres
-       link_for_update_status="https://monsite.com/api/arzeka/webhook"
+       mapped_order_id=order_id,
+       link_for_update_status=f"https://monsite.com/api/arzeka/webhook?order={quote(order_id)}"
    )
-
-Format de la notification
---------------------------
-
-Arzeka envoie une requête POST à votre URL avec ce format :
-
-.. code-block:: json
-
-   {
-       "mappedOrderId": "ORDER-2026-001",
-       "status": "COMPLETED",
-       "amount": 1000,
-       "transactionId": "TX123456789",
-       "paymentDate": "2026-02-23T10:35:00"
-   }
 
 Exemple d'implémentation Flask
 -------------------------------
@@ -305,21 +351,21 @@ Exemple d'implémentation Flask
 .. code-block:: python
 
    from flask import Flask, request, jsonify
-   from fasoarzeka import check_payment
+   from fasoarzeka import PaymentStatus, check_payment
 
    app = Flask(__name__)
 
-   @app.route('/api/arzeka/webhook', methods=['POST'])
+   @app.route('/api/arzeka/webhook', methods=['GET', 'POST'])
    def arzeka_webhook():
-       # Récupérer les données
-       data = request.json
-       order_id = data.get('mappedOrderId')
-       status = data.get('status')
+       # Référence placée par vous dans link_for_update_status
+       order_id = request.args.get('order')
+       if not order_id:
+           return jsonify({'status': 'ignored'}), 400
 
        # Vérifier le statut auprès d'Arzeka (sécurité)
        verified_status = check_payment(order_id)
 
-       if verified_status['status'] == 'COMPLETED':
+       if verified_status['status'] == PaymentStatus.COMPLETED:
            # Mettre à jour votre base de données
            update_order_status(order_id, 'PAID')
 
@@ -341,21 +387,19 @@ Exemple d'implémentation Django
 
    from django.http import JsonResponse
    from django.views.decorators.csrf import csrf_exempt
-   from django.views.decorators.http import require_POST
-   from fasoarzeka import check_payment
-   import json
+   from fasoarzeka import PaymentStatus, check_payment
 
    @csrf_exempt
-   @require_POST
    def arzeka_webhook(request):
-       # Récupérer les données
-       data = json.loads(request.body)
-       order_id = data.get('mappedOrderId')
+       # Référence placée par vous dans link_for_update_status
+       order_id = request.GET.get('order')
+       if not order_id:
+           return JsonResponse({'status': 'ignored'}, status=400)
 
        # Vérifier le statut
        verified_status = check_payment(order_id)
 
-       if verified_status['status'] == 'COMPLETED':
+       if verified_status['status'] == PaymentStatus.COMPLETED:
            # Mettre à jour la commande
            order = Order.objects.get(order_id=order_id)
            order.status = 'PAID'
@@ -372,16 +416,14 @@ Sécurité des webhooks
 Bonnes pratiques :
 
 1. **Vérifier le statut** : Appelez ``check_payment()`` pour confirmer
-2. **Valider le hash** : Vérifiez le hash si fourni par Arzeka
-3. **Idempotence** : Gérer les notifications en double
-4. **Retourner 200 OK** : Retourner rapidement une réponse HTTP 200
+2. **Idempotence** : Gérer les notifications en double
+3. **Retourner 200 OK** : Retourner rapidement une réponse HTTP 200
 
 .. code-block:: python
 
-   @app.route('/webhook', methods=['POST'])
+   @app.route('/webhook', methods=['GET', 'POST'])
    def webhook():
-       data = request.json
-       order_id = data.get('mappedOrderId')
+       order_id = request.args.get('order')
 
        # Vérifier si déjà traité (idempotence)
        if is_already_processed(order_id):
@@ -390,7 +432,7 @@ Bonnes pratiques :
        # Vérifier le statut auprès d'Arzeka
        verified = check_payment(order_id)
 
-       if verified['status'] == 'COMPLETED':
+       if verified['status'] == PaymentStatus.COMPLETED:
            # Traiter le paiement
            process_payment(order_id)
            mark_as_processed(order_id)
@@ -415,7 +457,7 @@ Exception lors de l'initiation
        client.authenticate("username", "password")
 
        try:
-           response = client.initiate_payment(
+           response, payment_data = client.initiate_payment(
                amount=1000,
                merchant_id="MERCHANT_123",
                # ... paramètres

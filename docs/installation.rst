@@ -184,13 +184,21 @@ Environnements de test et production
 URLs des environnements
 -----------------------
 
-* **Test** : ``https://pgw-test.fasoarzeka.bf/`` (valeur par défaut du client)
-* **Production** : ``https://pgw.fasoarzeka.bf/``
+* **Test** : ``https://pgw-test.fasoarzeka.bf/`` (constante ``TEST_BASE_URL``,
+  valeur par défaut du client)
+* **Production** : ``https://pgw.fasoarzeka.bf/`` (constante ``PRODUCTION_BASE_URL``)
+
+Ces URL sont celles de la documentation officielle de la passerelle (v2.0).
 
 .. important::
    Le client utilise l'environnement de **test** par défaut. En production,
-   passez explicitement ``base_url`` et vérifiez l'URL de production avec
-   Faso Arzeka lors de la remise de vos identifiants.
+   passez explicitement l'URL de production :
+
+   .. code-block:: python
+
+      from fasoarzeka import PRODUCTION_BASE_URL, ArzekaPayment
+
+      client = ArzekaPayment(base_url=PRODUCTION_BASE_URL)
 
 .. tip::
    Commencez toujours par tester votre intégration en environnement de test avant de passer en production.

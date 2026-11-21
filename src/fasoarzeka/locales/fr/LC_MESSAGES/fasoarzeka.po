@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fasoarzeka 0.2.0\n"
 "Report-Msgid-Bugs-To: https://github.com/mzeba/fasoarzeka/issues\n"
-"POT-Creation-Date: 2026-11-19 17:24+0000\n"
+"POT-Creation-Date: 2026-11-21 11:54+0000\n"
 "PO-Revision-Date: 2026-11-19 00:00+0000\n"
 "Last-Translator: Mohamed Zeba\n"
 "Language-Team: French\n"
@@ -12,122 +12,122 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
-#: src/fasoarzeka/base.py:187
+#: src/fasoarzeka/base.py:189
 msgid "Authentication token is not set. Please authenticate first."
 msgstr "Le jeton d'authentification n'est pas défini. Veuillez vous authentifier d'abord."
 
-#: src/fasoarzeka/base.py:225
+#: src/fasoarzeka/base.py:227
 #, python-format
 msgid "Request timeout after %(timeout)s seconds"
 msgstr "Délai d'attente écoulé après %(timeout)s secondes"
 
-#: src/fasoarzeka/base.py:231
+#: src/fasoarzeka/base.py:233
 #, python-format
 msgid "Failed to connect to Arzeka API: %(err)s"
 msgstr "Échec de la connexion à l'API Arzeka : %(err)s"
 
-#: src/fasoarzeka/base.py:242
+#: src/fasoarzeka/base.py:244
 #, python-format
 msgid "API request failed: %(err)s"
 msgstr "La requête API a échoué : %(err)s"
 
-#: src/fasoarzeka/base.py:249
+#: src/fasoarzeka/base.py:251
 #, python-format
 msgid "Unexpected error: %(err)s"
 msgstr "Erreur inattendue : %(err)s"
 
-#: src/fasoarzeka/base.py:441
+#: src/fasoarzeka/base.py:467
 msgid "Token expired and no credentials stored for automatic re-authentication. Please call authenticate() again with username and password."
 msgstr "Le jeton a expiré et aucun identifiant n'est enregistré pour la ré-authentification automatique. Veuillez rappeler authenticate() avec le nom d'utilisateur et le mot de passe."
 
-#: src/fasoarzeka/base.py:453
+#: src/fasoarzeka/base.py:479
 #, python-format
 msgid "Automatic re-authentication failed: %(err)s"
 msgstr "La ré-authentification automatique a échoué : %(err)s"
 
-#: src/fasoarzeka/base.py:483
+#: src/fasoarzeka/base.py:509
 msgid "username must be a non-empty string"
 msgstr "Le nom d'utilisateur doit être une chaîne non vide"
 
-#: src/fasoarzeka/base.py:486
+#: src/fasoarzeka/base.py:512
 msgid "password must be a non-empty string"
 msgstr "Le mot de passe doit être une chaîne non vide"
 
-#: src/fasoarzeka/base.py:524
+#: src/fasoarzeka/base.py:550
 msgid "Invalid response format from authentication endpoint"
 msgstr "Format de réponse invalide depuis le point d'authentification"
 
-#: src/fasoarzeka/base.py:529
+#: src/fasoarzeka/base.py:555
 msgid "Invalid JSON response from authentication endpoint"
 msgstr "Réponse JSON invalide du point d'authentification"
 
-#: src/fasoarzeka/base.py:536
+#: src/fasoarzeka/base.py:562
 msgid "Authentication response missing required fields"
 msgstr "La réponse d'authentification ne contient pas les champs requis"
 
-#: src/fasoarzeka/base.py:570
+#: src/fasoarzeka/base.py:596
 msgid "Invalid credentials: username or password is incorrect"
 msgstr "Identifiants invalides : le nom d'utilisateur ou le mot de passe est incorrect"
 
-#: src/fasoarzeka/base.py:572
-msgid "Access forbidden: account may be locked or inactive"
-msgstr "Accès interdit : le compte peut être bloqué ou inactif"
+#: src/fasoarzeka/base.py:599
+msgid "Access forbidden: invalid credentials or account locked/inactive"
+msgstr "Accès interdit : identifiants invalides ou compte bloqué/inactif"
 
-#: src/fasoarzeka/base.py:574
+#: src/fasoarzeka/base.py:602
 #, python-format
 msgid "Authentication request failed: %(err)s"
 msgstr "La requête d'authentification a échoué : %(err)s"
 
-#: src/fasoarzeka/base.py:587
+#: src/fasoarzeka/base.py:615
 #, python-format
 msgid "Failed to connect to authentication endpoint: %(err)s"
 msgstr "Échec de la connexion au point d'authentification : %(err)s"
 
-#: src/fasoarzeka/base.py:593
+#: src/fasoarzeka/base.py:621
 #, python-format
 msgid "Authentication request timeout after %(timeout)s seconds"
 msgstr "Délai d'attente de la requête d'authentification après %(timeout)s secondes"
 
-#: src/fasoarzeka/base.py:604
+#: src/fasoarzeka/base.py:632
 #, python-format
 msgid "Authentication failed with unexpected error: %(err)s"
 msgstr "L'authentification a échoué avec une erreur inattendue : %(err)s"
 
-#: src/fasoarzeka/base.py:640
+#: src/fasoarzeka/base.py:678
 #, python-format
-msgid "amount must be a positive number greater than %(min)s"
-msgstr "Le montant doit être un nombre positif supérieur à %(min)s"
+msgid "amount must be a number greater than or equal to %(min)s"
+msgstr "Le montant doit être un nombre supérieur ou égal à %(min)s"
 
-#: src/fasoarzeka/base.py:645
+#: src/fasoarzeka/base.py:683
 msgid "merchant_id must be a non-empty string/int"
 msgstr "merchant_id doit être une chaîne ou un entier non vide"
 
-#: src/fasoarzeka/base.py:651
+#: src/fasoarzeka/base.py:689
 msgid "additional_info must contain firstname, lastname, and mobile"
 msgstr "additional_info doit contenir firstname, lastname et mobile"
 
-#: src/fasoarzeka/base.py:661
+#: src/fasoarzeka/base.py:699
 msgid "additional_info fields firstname, lastname, and mobile cannot be empty or null"
 msgstr "Les champs additional_info firstname, lastname et mobile ne peuvent pas être vides ou nuls"
 
-#: src/fasoarzeka/base.py:681
+#: src/fasoarzeka/base.py:722
 #, python-format
 msgid "When generateReceipt is True, additional_info must contain: %(fields)s"
 msgstr "Lorsque generateReceipt est True, additional_info doit contenir : %(fields)s"
 
-#: src/fasoarzeka/base.py:740
+#: src/fasoarzeka/base.py:785
 msgid "mapped_order_id must be a non-empty string"
 msgstr "mapped_order_id doit être une chaîne non vide"
 
-#: src/fasoarzeka/base.py:785
+#: src/fasoarzeka/base.py:826
 msgid "mobile must be a non-empty string"
 msgstr "Le numéro mobile doit être une chaîne non vide"
 
-#: src/fasoarzeka/base.py:788
+#: src/fasoarzeka/base.py:829
 msgid "message must be a non-empty string"
 msgstr "Le message doit être une chaîne non vide"
 
-#: src/fasoarzeka/base.py:808
+#: src/fasoarzeka/base.py:849
 msgid "sms_id must be a non-empty string"
 msgstr "sms_id doit être une chaîne non vide"
 
@@ -136,15 +136,15 @@ msgstr "sms_id doit être une chaîne non vide"
 msgid "Not authenticated. Please call authenticate() first."
 msgstr "Non authentifié. Veuillez appeler authenticate() d'abord."
 
-#: src/fasoarzeka/utils.py:141
+#: src/fasoarzeka/utils.py:191
 msgid "Secret key cannot be empty or None"
 msgstr "La clé secrète ne peut pas être vide ou None"
 
-#: src/fasoarzeka/utils.py:143
+#: src/fasoarzeka/utils.py:193
 msgid "Secret key must be a string"
 msgstr "La clé secrète doit être une chaîne de caractères"
 
-#: src/fasoarzeka/utils.py:188
+#: src/fasoarzeka/utils.py:238
 #, python-format
 msgid "Failed to generate hash signature: %(err)s"
 msgstr "Échec de la génération de la signature de hachage : %(err)s"

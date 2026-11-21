@@ -99,7 +99,7 @@ Performance
    def make_payment():
        client = ArzekaPayment()
        client.authenticate("username", "password")
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
        client.close()
        return response
 
@@ -132,7 +132,7 @@ Performance
 
        # Faire plusieurs opérations
        for order in orders:
-           response = client.initiate_payment(...)
+           response, payment_data = client.initiate_payment(...)
 
 3. Configurer un timeout approprié
 -----------------------------------
@@ -176,7 +176,7 @@ Fiabilité
 
    # ✅ BON
    try:
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
    except ArzekaValidationError as e:
        logger.error(f"Validation error: {e}")
        return None
@@ -199,7 +199,7 @@ Fiabilité
    client.authenticate("username", "password")
 
    # Le client se réauthentifie automatiquement si nécessaire
-   response = client.initiate_payment(...)
+   response, payment_data = client.initiate_payment(...)
 
 3. Valider les données avant envoi
 -----------------------------------
@@ -220,7 +220,7 @@ Fiabilité
        phone = format_msisdn(phone)
 
        # Envoyer à l'API
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=amount,
            additional_info={
                "mobile": phone,
@@ -306,7 +306,7 @@ Structure du code
            try:
                logger.info(f"Creating payment for order {order_id}")
 
-               response = self.client.initiate_payment(
+               response, payment_data = self.client.initiate_payment(
                    amount=amount,
                    merchant_id=self.config.merchant_id,
                    additional_info={
@@ -319,7 +319,7 @@ Structure du code
                    link_back_to_calling_website=self.config.return_url
                )
 
-               logger.info(f"Payment created: {response['mappedOrderId']}")
+               logger.info(f"Payment created: {payment_data['mappedOrderId']}")
                return response
 
            except Exception as e:
@@ -351,12 +351,11 @@ Structure du code
        # ...
 
    # formatters.py
-   def format_payment_response(response):
-       """Formater la réponse pour l'API publique"""
+   def format_payment_response(response, payment_data):
+       """Formater le résultat de initiate_payment() pour l'API publique"""
        return {
-           'order_id': response['mappedOrderId'],
+           'order_id': payment_data['mappedOrderId'],
            'payment_url': response['url'],
-           'status': response['status']
        }
 
    # services.py
@@ -437,18 +436,18 @@ Tests
        @patch('fasoarzeka.ArzekaPayment')
        def test_create_payment(self, mock_client):
            # Configurer le mock
-           mock_client.return_value.initiate_payment.return_value = {
-               'mappedOrderId': 'ORDER-001',
-               'url': 'https://...',
-               'status': 'PENDING'
-           }
+           # initiate_payment() renvoie (réponse de l'API, données envoyées)
+           mock_client.return_value.initiate_payment.return_value = (
+               {'url': 'https://...'},
+               {'mappedOrderId': 'ORDER-001'},
+           )
 
            # Tester
            service = PaymentService()
            response = service.create_payment(1000, "22670123456", "ORDER-001")
 
            # Vérifier
-           self.assertEqual(response['mappedOrderId'], 'ORDER-001')
+           self.assertEqual(response['url'], 'https://...')
 
 2. Utiliser l'environnement de test
 ------------------------------------

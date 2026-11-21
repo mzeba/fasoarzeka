@@ -71,8 +71,8 @@ payment_data = {
     "amount": 1000,  # Montant en FCFA (minimum 100)
     "merchant_id": "MERCHANT_123",
     "additional_info": {
-        "first_name": "Jean",
-        "last_name": "Dupont",
+        "firstname": "Jean",
+        "lastname": "Dupont",
         "mobile": "22670123456"  # Numéro avec indicatif
     },
     "mapped_order_id": "T20220923.203221.24732",
@@ -81,11 +81,11 @@ payment_data = {
     "link_back_to_calling_website": "https://example.com/return"
 }
 
-response = initiate_payment(payment_data)
+response, sent = initiate_payment(payment_data)
 print(f"URL to redirect user for payment: {response['url']}")
 
 # 3. Vérifiez le statut du paiement
-payment_response = check_payment(payment_data['mapped_order_id'])
+payment_response = check_payment(sent['mappedOrderId'])
 print(f"Payment status: {payment_response['status']}")
 ```
 
@@ -104,12 +104,12 @@ with ArzekaPayment() as client:
         print("Token is valid")
 
     # 3. Initiez un paiement
-    response = client.initiate_payment(
+    response, payment_data = client.initiate_payment(
         amount=1000,
         merchant_id="MERCHANT_123",
         additional_info={
-            "first_name": "Jean",
-            "last_name": "Dupont",
+            "firstname": "Jean",
+            "lastname": "Dupont",
             "mobile": "70123456"
         },
         mapped_order_id="T20220923.203221.24732",
@@ -167,7 +167,7 @@ client.authenticate("username", "password")
 for i in range(10):
     # Pas besoin de vérifier la validité du token !
     # Le client se réauthentifie automatiquement si nécessaire
-    response = client.initiate_payment(
+    response, payment_data = client.initiate_payment(
         amount=1000,
         merchant_id="MERCHANT_123",
         additional_info={...},
@@ -175,7 +175,7 @@ for i in range(10):
         link_for_update_status="https://...",
         link_back_to_calling_website="https://..."
     )
-    print(f"Payment {i+1}: {response['mappedOrderId']}")
+    print(f"Payment {i+1}: {payment_data['mappedOrderId']}")
 
 client.close()
 ```
@@ -193,8 +193,8 @@ payment_data = {
     "amount": 5000,
     "merchant_id": "MERCHANT_123",
     "additional_info": {
-        "first_name": "Marie",
-        "last_name": "Kaboré",
+        "firstname": "Marie",
+        "lastname": "Kaboré",
         "mobile": "70987654",
         "generateReceipt": True,  # Activer la génération de reçu
         "paymentDescription": "Facture N°12345",
@@ -208,9 +208,9 @@ payment_data = {
     "mapped_order_id": "ORDER-2025-001"  # ID personnalisé
 }
 
-response = initiate_payment(payment_data)
-print(f"Payment URL: {response.get('payment_url')}")
-print(f"Order ID: {response.get('mappedOrderId')}")
+response, sent = initiate_payment(payment_data)
+print(f"Payment URL: {response['url']}")
+print(f"Order ID: {sent['mappedOrderId']}")
 ```
 
 ### Vérification de paiement
@@ -271,7 +271,7 @@ try:
     client.authenticate("username", "password")
 
     # Tentative de paiement
-    response = client.initiate_payment(
+    response, payment_data = client.initiate_payment(
         amount=1000,
         merchant_id="MERCHANT_123",
         additional_info={...},
@@ -468,7 +468,7 @@ client = ArzekaPayment()
 from fasoarzeka import ArzekaPayment
 with ArzekaPayment() as client:
     client.authenticate("user", "pass")
-    response = client.initiate_payment(...)
+    response, payment_data = client.initiate_payment(...)
 # Fermeture automatique de la session
 ```
 
@@ -516,7 +516,7 @@ with ArzekaPayment() as client:
 
 ```python
 try:
-    response = client.initiate_payment(...)
+    response, payment_data = client.initiate_payment(...)
 except ArzekaValidationError:
     # Données invalides
 except ArzekaAuthenticationError:
@@ -644,7 +644,7 @@ Si ce projet vous aide, n'oubliez pas de lui donner une ⭐ sur GitHub !
 Pour la production, assurez-vous de configurer l'URL de production :
 
 ```python
-from fasoarzeka import ArzekaPayment
+from fasoarzeka import PRODUCTION_BASE_URL, ArzekaPayment
 
-client = ArzekaPayment(base_url="https://pgw.fasoarzeka.bf/")
+client = ArzekaPayment(base_url=PRODUCTION_BASE_URL)  # https://pgw.fasoarzeka.bf/
 ```

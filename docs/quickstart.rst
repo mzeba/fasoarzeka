@@ -59,8 +59,8 @@ Initier un paiement
        "amount": 1000,  # Montant en FCFA (minimum 100)
        "merchant_id": "MERCHANT_123",
        "additional_info": {
-           "first_name": "Jean",
-           "last_name": "Dupont",
+           "firstname": "Jean",
+           "lastname": "Dupont",
            "mobile": "22670123456"  # Format : indicatif + numéro
        },
        "mapped_order_id": "ORDER-2026-001",  # ID unique de votre commande
@@ -70,11 +70,10 @@ Initier un paiement
    }
 
    # Initier le paiement
-   response = initiate_payment(payment_data)
+   response, sent = initiate_payment(payment_data)
 
-   print(f"ID du paiement : {response['mappedOrderId']}")
+   print(f"ID du paiement : {sent['mappedOrderId']}")
    print(f"URL de redirection : {response['url']}")
-   print(f"QR Code pour paiement : {response['qrcode']}")
 
 Vérifier le statut d'un paiement
 ---------------------------------
@@ -88,7 +87,7 @@ Vérifier le statut d'un paiement
 
    print(f"Statut : {status['status']}")
    print(f"Montant : {status['amount']} FCFA")
-   print(f"Date : {status['orderDate']}")
+   print(f"Créé le : {status['created_at']}")
 
 Exemple complet
 ---------------
@@ -106,8 +105,8 @@ Exemple complet
        "amount": 1000,
        "merchant_id": "MERCHANT_123",
        "additional_info": {
-           "first_name": "Jean",
-           "last_name": "Dupont",
+           "firstname": "Jean",
+           "lastname": "Dupont",
            "mobile": "22670123456"
        },
        "mapped_order_id": "ORDER-2026-001",
@@ -116,7 +115,7 @@ Exemple complet
        "link_back_to_calling_website": "https://exemple.com/retour"
    }
 
-   response = initiate_payment(payment_data)
+   response, sent = initiate_payment(payment_data)
    print(f"✅ Paiement initié : {response['url']}")
 
    # 3. Vérifier le statut (après que l'utilisateur ait payé)
@@ -144,12 +143,12 @@ Le context manager gère automatiquement l'ouverture et la fermeture de la sessi
        auth = client.authenticate("votre_username", "votre_password")
 
        # 2. Initier un paiement
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=1000,
            merchant_id="MERCHANT_123",
            additional_info={
-               "first_name": "Jean",
-               "last_name": "Dupont",
+               "firstname": "Jean",
+               "lastname": "Dupont",
                "mobile": "22670123456"
            },
            mapped_order_id="ORDER-2026-001",
@@ -181,7 +180,7 @@ Si vous préférez gérer manuellement le cycle de vie du client :
        auth = client.authenticate("votre_username", "votre_password")
 
        # Faire des opérations
-       response = client.initiate_payment(...)
+       response, payment_data = client.initiate_payment(...)
 
    finally:
        # Toujours fermer le client
@@ -225,12 +224,12 @@ Exemple avec gestion d'erreurs
            auth = client.authenticate("username", "password")
 
            # Initier un paiement
-           response = client.initiate_payment(
+           response, payment_data = client.initiate_payment(
                amount=1000,
                merchant_id="MERCHANT_123",
                additional_info={
-                   "first_name": "Jean",
-                   "last_name": "Dupont",
+                   "firstname": "Jean",
+                   "lastname": "Dupont",
                    "mobile": "22670123456"
                },
                mapped_order_id="ORDER-2026-001",
@@ -277,14 +276,13 @@ Génération du Hash
 
 .. code-block:: python
 
-   from fasoarzeka.utils import generate_hash
+   # Le hashString est calculé automatiquement par initiate_payment() :
+   # vous n'avez rien à faire. Il est renvoyé dans payment_data :
+   response, payment_data = client.initiate_payment(...)
+   print(f"Hash : {payment_data['hashString']}")
 
-   hash_value = generate_hash(
-       mapped_order_id="ORDER-2026-001",
-       amount=1000,
-       hash_secret="votre_secret"
-   )
-   print(f"Hash : {hash_value}")
+   # Pour reproduire une signature (débogage), voir generate_hash_signature()
+   # dans la page Utilitaires.
 
 Configuration du Logging
 -------------------------
@@ -318,12 +316,12 @@ Exemple 1 : Paiement simple
    auth = authenticate("username", "password")
 
    # Préparer et envoyer le paiement
-   response = initiate_payment({
+   response, payment_data = initiate_payment({
        "amount": 1000,
        "merchant_id": "MERCHANT_123",
        "additional_info": {
-           "first_name": "Marie",
-           "last_name": "Kaboré",
+           "firstname": "Marie",
+           "lastname": "Kaboré",
            "mobile": "22670123456"
        },
        "mapped_order_id": "ORDER-001",
@@ -341,7 +339,7 @@ Exemple 2 : Vérification périodique du statut
 .. code-block:: python
 
    import time
-   from fasoarzeka import check_payment
+   from fasoarzeka import PaymentStatus, check_payment
 
    order_id = "ORDER-001"
    max_attempts = 10
@@ -349,11 +347,11 @@ Exemple 2 : Vérification périodique du statut
    for attempt in range(max_attempts):
        status = check_payment(order_id)
 
-       if status['status'] == 'COMPLETED':
+       if status['status'] == PaymentStatus.COMPLETED:
            print("✅ Paiement réussi !")
            break
-       elif status['status'] == 'FAILED':
-           print("❌ Paiement échoué")
+       elif status['status'] == PaymentStatus.INCOMPLETE:
+           print("❌ Paiement non abouti")
            break
        else:
            print(f"⏳ En attente... (tentative {attempt + 1}/{max_attempts})")
@@ -380,12 +378,12 @@ Exemple 3 : Application web Flask
        data = request.json
 
        # Initier le paiement
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=data['amount'],
            merchant_id="MERCHANT_123",
            additional_info={
-               "first_name": data['first_name'],
-               "last_name": data['last_name'],
+               "firstname": data['first_name'],
+               "lastname": data['last_name'],
                "mobile": data['mobile']
            },
            mapped_order_id=data['order_id'],
@@ -397,7 +395,7 @@ Exemple 3 : Application web Flask
        # Retourner l'URL de paiement
        return jsonify({
            'payment_url': response['url'],
-           'order_id': response['mappedOrderId']
+           'order_id': payment_data['mappedOrderId']
        })
 
    @app.route('/webhook', methods=['POST'])

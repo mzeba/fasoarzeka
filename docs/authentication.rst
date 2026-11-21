@@ -166,7 +166,7 @@ Exemple d'utilisation
        print(f"✅ Authentifié ! Token valide {auth['expires_in']}s")
 
        # Le client utilise maintenant automatiquement le token
-       response = client.initiate_payment(
+       response, payment_data = client.initiate_payment(
            amount=1000,
            merchant_id="MERCHANT_123",
            # ... autres paramètres
@@ -190,12 +190,12 @@ Exemple 1 : Workflow complet (Authentification + Paiement)
 
    # 2. Utiliser le token dans les opérations suivantes
    # (Le token est automatiquement utilisé par les fonctions de convenance)
-   response = initiate_payment({
+   response, payment_data = initiate_payment({
        "amount": 1000,
        "merchant_id": "MERCHANT_123",
        "additional_info": {
-           "first_name": "Jean",
-           "last_name": "Dupont",
+           "firstname": "Jean",
+           "lastname": "Dupont",
            "mobile": "22670123456"
        },
        "mapped_order_id": "ORDER-001",
@@ -222,9 +222,9 @@ Exemple 2 : Authentification intégrée avec la classe
        print(f"Expires in: {auth['expires_in']}s")
 
        # Faire plusieurs opérations avec le même client
-       response1 = client.initiate_payment(...)
+       response1, _ = client.initiate_payment(...)
        response2 = client.check_payment("ORDER-001")
-       response3 = client.initiate_payment(...)
+       response3, _ = client.initiate_payment(...)
 
 Exemple 3 : Gestion des erreurs d'authentification
 ---------------------------------------------------
@@ -314,7 +314,7 @@ Cela permet la **réauthentification automatique** lorsque le token expire.
    # → self._expires_at = 1709564421
 
    # Plus tard, si le token expire, réauthentification automatique
-   response = client.initiate_payment(...)
+   response, payment_data = client.initiate_payment(...)
    # → Vérifie is_token_valid()
    # → Si expiré, réauthentifie avec les credentials stockés
    # → Puis fait la requête
@@ -469,7 +469,7 @@ Problème : "Token expired"
 
    # Solution automatique (recommandé)
    # La bibliothèque gère automatiquement la réauthentification
-   response = client.initiate_payment(...)  # Auto re-auth si nécessaire
+   response, payment_data = client.initiate_payment(...)  # Auto re-auth si nécessaire
 
 Problème : "Invalid credentials"
 ---------------------------------

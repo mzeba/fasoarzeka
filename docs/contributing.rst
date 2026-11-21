@@ -220,17 +220,16 @@ Documentez toutes les fonctions publiques :
            ...
 
        Returns:
-           Dictionnaire contenant:
-           - mappedOrderId: ID de la commande
-           - url: URL de redirection
-           - qrcode: QR code de paiement
+           Tuple (response, payment_data):
+           - response: réponse de l'API, {"url": URL de redirection}
+           - payment_data: données envoyées, dont mappedOrderId
 
        Raises:
            ArzekaValidationError: Si les données sont invalides
            ArzekaAPIError: Si l'API retourne une erreur
 
        Example:
-           >>> response = client.initiate_payment(
+           >>> response, payment_data = client.initiate_payment(
            ...     amount=1000,
            ...     merchant_id="MERCHANT_123"
            ... )

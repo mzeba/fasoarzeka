@@ -4,23 +4,73 @@ Utility functions for Arzeka Payment API
 
 import base64
 import hashlib
-from datetime import datetime
+import uuid
+from typing import Mapping, Optional, Union
+from urllib.parse import parse_qs, urlsplit
 
 from .i18n import _
+
+# Name of the query parameter added by the gateway to linkBackToCallingWebsite.
+# The official documentation spells it both "paymentRequestId" and "paymentRequestID".
+PAYMENT_REQUEST_ID_PARAM = "paymentRequestId"
 
 
 def get_reference() -> str:
     """
-    Generate a unique reference ID for payment transactions
+    Generate a unique reference ID (mappedOrderId) for payment transactions
 
-    Format: {YYMMDD}.{HHMMSS}.{microseconds}
-    Example: 251022.143025.123456
+    A random UUID4, as in the official API examples (36 characters, the API
+    accepts up to 50). Unique across processes and servers.
+    Example: 9b1248cc-dad4-4f1e-baa1-16410de1ecec
 
     Returns:
         str: Unique reference ID
     """
-    reference = datetime.now().strftime("%y%m%d.%H%M%S.%f")
-    return f"{reference}"
+    return str(uuid.uuid4())
+
+
+def get_payment_request_id(
+    query: Union[str, Mapping[str, object]],
+) -> Optional[str]:
+    """
+    Extract the payment reference from the gateway's return to the merchant site
+
+    After payment, the gateway redirects the user to linkBackToCallingWebsite
+    with ``?paymentRequestId=<mappedOrderId>``. The parameter name is matched
+    case-insensitively (the documentation uses both spellings).
+
+    Warning:
+        This value comes from the user's browser and can be forged. Always
+        confirm the payment with check_payment() before delivering anything.
+
+    Args:
+        query: Full return URL, raw query string, or a mapping of query
+            parameters (e.g. ``request.args`` in Flask, ``request.GET`` in Django)
+
+    Returns:
+        The mappedOrderId, or None if the parameter is absent or empty
+
+    Example:
+        >>> get_payment_request_id("https://shop.example/retour?paymentRequestID=9b12")
+        '9b12'
+    """
+    if isinstance(query, str):
+        if "?" in query or "://" in query:
+            query = urlsplit(query).query
+        params: Mapping[str, object] = {
+            key: values[-1] for key, values in parse_qs(query).items()
+        }
+    else:
+        params = query
+
+    wanted = PAYMENT_REQUEST_ID_PARAM.lower()
+    for key, value in params.items():
+        if key.lower() == wanted:
+            if isinstance(value, (list, tuple)):
+                value = value[-1] if value else None
+            value = str(value).strip() if value is not None else ""
+            return value or None
+    return None
 
 
 def format_msisdn(phone_number: str) -> str:

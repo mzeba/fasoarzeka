@@ -114,7 +114,7 @@ et des paramètres nommés (jamais de f-string dans ``_()``) :
    from .i18n import _
 
    raise ArzekaValidationError(
-       _("amount must be a positive number greater than %(min)s")
+       _("amount must be a number greater than or equal to %(min)s")
        % {"min": MINIMUM_AMOUNT}
    )
 

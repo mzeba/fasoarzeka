@@ -420,7 +420,7 @@ Exemple avec réauth automatique
 
    # Faire des opérations sans se soucier du token
    # La réauthentification est automatique
-   response1 = client.initiate_payment(...)
+   response1, _ = client.initiate_payment(...)
    response2 = client.check_payment(...)
 
    # Vérifier l'état après les opérations
@@ -464,7 +464,7 @@ Best practices
           logger.warning("Token will expire soon")
 
       # Mais laisser la réauthentification automatique gérer le reste
-      response = client.initiate_payment(...)  # Auto re-auth if needed
+      response, payment_data = client.initiate_payment(...)  # Auto re-auth if needed
 
 4. **Vérifications périodiques dans les applications long-running**
 
