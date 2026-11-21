@@ -4,6 +4,34 @@ Changelog
 
 Toutes les modifications notables de ce projet seront documentées dans ce fichier.
 
+Version 0.3.0 (2026-11-21)
+==========================
+
+Corrections issues d'un test de la librairie contre l'environnement de test réel
+de la passerelle FASO ARZEKA. Aucun changement incompatible.
+
+Fonctionnalités ajoutées
+-------------------------
+
+* 📌 ``PaymentStatus.INIT`` : statut renvoyé par la passerelle tant que la page
+  de paiement n'a pas été ouverte. Il ne figure pas dans la documentation
+  officielle, mais il est bien renvoyé par la passerelle. ``PaymentStatus.ALL``
+  contient désormais les quatre statuts. Voir :doc:`payments`.
+
+Corrections
+-----------
+
+* 🔁 La ré-authentification automatique ne se déclenche plus que lorsque la
+  passerelle refuse le jeton (403 au corps vide). Un 403 accompagné d'un message
+  d'erreur, par exemple ``{"error": "Invalid hashString"}`` pour un hash
+  invalide, est levé immédiatement : avant, il provoquait une
+  ré-authentification et un second envoi inutiles.
+* 📚 Les exemples de vérification périodique s'arrêtaient sur ``INCOMPLETE``. Or
+  ce statut apparaît dès que l'utilisateur ouvre la page de paiement, pendant
+  qu'il paie encore. Ils n'arrêtent plus que sur ``COMPLETED``.
+* 📚 Cycle de vie des statuts décrit (``INIT`` → ``INCOMPLETE`` → ``PENDING`` →
+  ``COMPLETED``).
+
 Version 0.2.0 (2026-11-21)
 ==========================
 
@@ -15,13 +43,12 @@ Fonctionnalités ajoutées
   Voir :doc:`i18n`. Les messages restent en anglais par défaut.
 * 🛠️ Scripts ``scripts/extract_messages.sh`` et
   ``scripts/compile_messages.sh`` pour maintenir les traductions.
-* 📌 Constantes ``PaymentStatus`` (``INIT``, ``INCOMPLETE``, ``PENDING``, ``COMPLETED``),
+* 📌 Constantes ``PaymentStatus`` (``COMPLETED``, ``INCOMPLETE``, ``PENDING``),
   ``TEST_BASE_URL`` et ``PRODUCTION_BASE_URL``, conformes à la documentation
   officielle de la passerelle.
 * ↩️ ``get_payment_request_id()`` : lit la référence (``paymentRequestId``) au
   retour sur le site marchand. Voir :doc:`payments`.
-* 🔁 Ré-authentification automatique (une seule fois) quand la passerelle refuse
-  le jeton (403 sans message d'erreur).
+* 🔁 Ré-authentification automatique (une seule fois) quand la passerelle répond 403.
 * 💰 ``initiate_payment()`` accepte les montants ``Decimal``.
 
 Corrections

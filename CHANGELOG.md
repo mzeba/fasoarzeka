@@ -7,6 +7,31 @@ respecte le [versionnage sémantique](https://semver.org/lang/fr/).
 Le détail est aussi disponible dans la
 [documentation](https://fasoarzeka.readthedocs.io/fr/latest/changelog.html).
 
+## [0.3.0] - 2026-11-21
+
+Corrections issues d'un test de la librairie contre l'environnement de test réel
+de la passerelle FASO ARZEKA. Aucun changement incompatible.
+
+### Ajouté
+
+- `PaymentStatus.INIT` : statut renvoyé par la passerelle tant que la page de
+  paiement n'a pas été ouverte. Il ne figure pas dans la documentation officielle,
+  mais il est bien renvoyé par la passerelle. `PaymentStatus.ALL` contient désormais
+  les quatre statuts.
+
+### Corrigé
+
+- La ré-authentification automatique ne se déclenche plus que lorsque la passerelle
+  refuse le jeton (403 au corps vide). Un 403 accompagné d'un message d'erreur, par
+  exemple `{"error": "Invalid hashString"}` pour un hash invalide, est levé
+  immédiatement : avant, il provoquait une ré-authentification et un second envoi
+  inutiles.
+- Documentation : les exemples de vérification périodique s'arrêtaient sur
+  `INCOMPLETE`. Or ce statut apparaît dès que l'utilisateur ouvre la page de paiement,
+  pendant qu'il paie encore. Les exemples n'arrêtent plus que sur `COMPLETED`.
+- Documentation : cycle de vie des statuts décrit (`INIT` → `INCOMPLETE` →
+  `PENDING` → `COMPLETED`).
+
 ## [0.2.0] - 2026-11-21
 
 ### Ajouté
@@ -18,12 +43,11 @@ Le détail est aussi disponible dans la
 - Exception `ArzekaAuthenticationAPIError`, à la fois `ArzekaAuthenticationError` et
   `ArzekaAPIError`, levée pour les erreurs HTTP de l'authentification (401, 403, 5xx).
 - Export de `ArzekaAPIError` depuis le package.
-- Constantes `PaymentStatus` (`INIT`, `INCOMPLETE`, `PENDING`, `COMPLETED`), `TEST_BASE_URL`
+- Constantes `PaymentStatus` (`COMPLETED`, `INCOMPLETE`, `PENDING`), `TEST_BASE_URL`
   et `PRODUCTION_BASE_URL`, conformes à la documentation officielle de la passerelle.
 - `get_payment_request_id()` : lit la référence (`paymentRequestId`) au retour sur
   le site marchand.
-- Ré-authentification automatique (une seule fois) quand la passerelle refuse le
-  jeton (403 sans message d'erreur).
+- Ré-authentification automatique (une seule fois) quand la passerelle répond 403.
 - `initiate_payment()` accepte les montants `Decimal`.
 
 ### Corrigé
@@ -39,7 +63,6 @@ Le détail est aussi disponible dans la
   réponse et vrais statuts ; suppression des fonctions, paramètres et champs
   inexistants (`generate_hash`, `generate_order_id`, `order_description`, `qrcode`,
   statuts `FAILED`/`CANCELLED`...).
-
 - Les requêtes POST ne sont plus jamais renvoyées automatiquement (seules les GET le
   sont) : rejouer `initiate_payment` pouvait créer deux fois le même paiement.
 - La bibliothèque n'appelle plus `logging.basicConfig()` à l'import.
@@ -68,6 +91,7 @@ Le détail est aussi disponible dans la
 
 - Première publication sur PyPI.
 
+[0.3.0]: https://github.com/mzeba/fasoarzeka/compare/0.2.0...0.3.0
 [0.2.0]: https://github.com/mzeba/fasoarzeka/compare/0.1.3...0.2.0
 [0.1.3]: https://pypi.org/project/fasoarzeka/0.1.3/
 [0.1.2]: https://pypi.org/project/fasoarzeka/0.1.2/
